@@ -1,5 +1,5 @@
 /* Transparent Redirect JavaScript to append the form with session token */
-var Nab = {
+var Velocity = {
     mod10: function (e) {
         var digit, num, reverse, count, index;
         reverse = !0, count = 0, num = (e + "").split("").reverse();
@@ -11,25 +11,18 @@ var Nab = {
         return count % 10 === 0
     },
 
-    tokenizeForm: function(identitytoken, card, address, applicationprofileid, merchantprofileid, callbackfunction) {
-        var sessiontokenobj = Nab.getSessionToken(identitytoken, callbackfunction);
+    tokenizeForm: function(identitytoken, card, address, applicationprofileid, merchantprofileid, workflowid, callbackfunction) {
+	
+		var identitytoken = Velocity.base64_encode(identitytoken+":");
+        var sessiontokenobj = Velocity.getSessionToken(identitytoken, callbackfunction);
 
         if (!sessiontokenobj)
             // Validate browser compatibility
-            Nab.complete({'code': 1, 'text': 'Browser is not supported!' }, callbackfunction);
-        else if (!Nab.valcard_num(card.number))
-            // Validate Card number with Length
-            Nab.complete({'code': 2, 'text': 'Invalid Card Number' }, callbackfunction);
-        else if (!Nab.valcvv_num(card.cvc))
-            // Validate Card cvv
-            Nab.complete({'code': 3, 'text': 'Invalid cvv number' }, callbackfunction);
-        else if (!Nab.valcc_exp(card.expMonth+card.expYear))
-			// Validate Card Expiry date
-            Nab.complete({'code': 4, 'text': 'Invalid card expiry date' }, callbackfunction);
+            Velocity.complete({'code': 1, 'text': 'Browser is not supported!' }, callbackfunction);
         else {
             // XMLHttpRequest Error Handler
             sessiontokenobj.onerror = function() {		
-                Nab.complete({'code': 7, 'text': 'Unexpected Error occured. Request Failed' }, callbackfunction);
+                Velocity.complete({'code': 7, 'text': 'XMLHttpRequest Error occured. Request Failed' }, callbackfunction);
             };
 
             // Session Token Request response Handler
@@ -37,102 +30,132 @@ var Nab = {
 			
                 // Validate HTTP Status code
                 if (sessiontokenobj.status == 400)
-                    Nab.complete({'code': sessiontokenobj.status, 'text': 'bad request may be Identity Token is not correct' }, callbackfunction)
+                    Velocity.complete({'code': sessiontokenobj.status, 'text': 'An invalid security token was provided(Identity Token)' }, callbackfunction)
 				else if (sessiontokenobj.status == 401)
-				    Nab.complete({'code': sessiontokenobj.status, 'text': 'Unauthorized request may be Identity Token is not correct' }, callbackfunction)
+				    Velocity.complete({'code': sessiontokenobj.status, 'text': 'Unauthorized request may be Identity Token is not correct' }, callbackfunction)
 				else if (typeof sessiontokenobj.status != "undefined" && sessiontokenobj.status != 200)
-				    Nab.complete({'code': sessiontokenobj.status, 'text': 'Some unexpected error' }, callbackfunction)
+				    Velocity.complete({'code': sessiontokenobj.status, 'text': 'Some unexpected error for sessiontoken request' }, callbackfunction)
                 else {
                     // process received session token
                     var sessiontoken = JSON.parse(sessiontokenobj.response); 
-                    sessiontoken = Nab.base64_encode(sessiontoken+":");
+                    sessiontoken = Velocity.base64_encode(sessiontoken+":");
 
                     // Service information request
-                    var serviceInfo = Nab.getServiceInfo(sessiontoken, callbackfunction); // actual call.
+                    var serviceInfo = Velocity.getServiceInfo(sessiontoken, callbackfunction); // actual call.
 
                     // Service Info Request Error handler
                     serviceInfo.onerror = function() {		
-                        Nab.complete({'code': 10, 'text': 'Unexpected Error occured. Request Failed' }, callbackfunction);
+                        Velocity.complete({'code': 10, 'text': 'Ajax Error in serviceinfo transaction, Request Failed' }, callbackfunction);
                     };
 
                     // Service Info Request response handler
                     serviceInfo.onload = function() {
 
-                        if (typeof serviceInfo.status != "undefined" && serviceInfo.status !== 200)
-                            Nab.complete({'code': serviceInfo.status, 'text': 'Unexpected Error occured' }, callbackfunction)
+						if (serviceInfo.status == 400)
+							Velocity.complete({'code': serviceInfo.status, 'text': 'Security token is not valid(Session Token)' }, callbackfunction)
+                        else if (typeof serviceInfo.status != "undefined" && serviceInfo.status !== 200)
+                            Velocity.complete({'code': serviceInfo.status, 'text': 'Unexpected Error occured for serviceinfo request' }, callbackfunction)
                         else {
-                            var json = JSON.parse(serviceInfo.responseText);
-
-                            // Get service/workflow id
-							var serviceid, workflowid;
-							if(typeof json['BankcardServices'][0]['ServiceId'] != 'undefined' && json['BankcardServices'][0]['ServiceId'] != ''){
-							
-                               serviceid = json['BankcardServices'][0]['ServiceId'];
-                               workflowid = serviceid;
-							   
-							}else{
-							
-							   Nab.complete({'code': 20, 'text': 'Service id is empty in response' }, callbackfunction)
-							
-							}   
                                             
                             // Send Verify Request
-                            var verifyresponse = Nab.getverificationResponse(sessiontoken, workflowid, callbackfunction);
+                            var verifyresponse = Velocity.getverificationResponse(sessiontoken, workflowid, callbackfunction);
                             
                             // Error Handler for Verify Request
                             verifyresponse.onerror = function() {		
-                                Nab.complete({'code': 14, 'text': 'Unexpected Error occured. Request Failed' }, callbackfunction);
+                                Velocity.complete({'code': 14, 'text': 'Ajax Error in verify transaction, Request Failed' }, callbackfunction);
                             };
                             
                             // Response Handler for Verify Request
                             verifyresponse.onload = function() {
-                                // Validate HTTP Status code
-                                if(typeof verifyresponse.status != "undefined" && verifyresponse.status !== 200)
-                                    Nab.complete({'code': verifyresponse.status, 'text': 'Validation Errors Occurred' }, callbackfunction)
+                                // Validate gateway response as status and Error code
+								xmldoc = verifyresponse.responseXML;
+								errobj = xmldoc.getElementsByTagName("ErrorId");
+								errmsgobj = xmldoc.getElementsByTagName("Reason");
+								errRmsgobj = xmldoc.getElementsByTagName("ValidationErrors");
+
+								if(typeof errobj[0] != "undefined" && typeof errmsgobj[0] != "undefined") {
+									ErrorId = errobj[0].childNodes[0].nodeValue; // get Error code from response
+									reson = errmsgobj[0].childNodes[0].nodeValue; // get Error response message
+								}
+
+								if(typeof errobj[0] != "undefined" && typeof errRmsgobj[0] != "undefined") {
+									ErrorId = errobj[0].childNodes[0].nodeValue; // get error code from response
+									RuleMessage = errRmsgobj[0].childNodes[0].childNodes[2].childNodes[0].nodeValue; // get rule error response message
+								}
+
+								if(typeof ErrorId != "undefined" && ErrorId == 326)
+                                    Velocity.complete({'code': ErrorId, 'text': reson}, callbackfunction)
+								else if(typeof ErrorId != "undefined" && ErrorId == 0)
+                                    Velocity.complete({'code': ErrorId+30, 'text': RuleMessage}, callbackfunction)
+                                else if(typeof verifyresponse.status != "undefined" && verifyresponse.status !== 200)
+                                    Velocity.complete({'code': verifyresponse.status, 'text': 'Validation Errors Occurred' }, callbackfunction)
                                 else {
 								    // get xml response after verification.
-                                    xmldoc = verifyresponse.responseXML;
                                     objsc = xmldoc.getElementsByTagName("StatusCode");
 									objs = xmldoc.getElementsByTagName("Status");
 									objpadt = xmldoc.getElementsByTagName("PaymentAccountDataToken");
-									
+									objCVResult = xmldoc.getElementsByTagName("CVResult");
+									objAVSResult = xmldoc.getElementsByTagName("AVSResult");
+								
 									// get status code from response
-									StatusCode = objsc[0].childNodes[0].nodeValue;
-									                                
+									if(typeof objsc[0] != 'undefined') {
+										StatusCode = objsc[0].childNodes[0].nodeValue;
+									}
+									                     
 									// get status from response
-									var Status;
-									if(typeof objs[0].childNodes[0].nodeValue != 'undefined' && objs[0].childNodes[0].nodeValue == 'Successfull'){
+									if(typeof objs[0] != 'undefined' && objs[0].childNodes[0].nodeValue == 'Successful'){
 									  Status = objs[0].childNodes[0].nodeValue;
 									}else{
-									  Nab.complete({'code': 21, 'text': 'Invalid status in response' }, callbackfunction)
+									  Velocity.complete({'code': 21, 'text': 'Invalid account detail.' }, callbackfunction)
 									}
 									
 									
 									// get PaymentAccountDataToken from response
-									var paymentAccountDataToken;
-									if(typeof objpadt[0].childNodes[0].nodeValue != 'undefined' && objpadt[0].childNodes[0].nodeValue != ''){
+									if(typeof objpadt[0] != 'undefined' && objpadt[0].childNodes[0].nodeValue != ''){
 									   paymentAccountDataToken = objpadt[0].childNodes[0].nodeValue;
 									}else{
-									   Nab.complete({'code': 22, 'text': 'payment Account Data Token is not available in response' }, callbackfunction)
+									   Velocity.complete({'code': 22, 'text': 'payment Account Data Token is not available in response' }, callbackfunction)
 									}
 									
-									cardSecurityData = {"AVSData": address, "CVData": card.cvc, "workflowid": serviceid, "CVDataProvided": "Provided"};
+									// get CVResult from response
+									var CVResult;
+									if(typeof objCVResult[0] != 'undefined' && objCVResult[0].childNodes[0].nodeValue != ''){
+									   CVResult = objCVResult[0].childNodes[0].nodeValue;
+									}else{
+									   Velocity.complete({'code': 23, 'text': 'CVResult is not available in response' }, callbackfunction)
+									}
+									
+									// get AVSResult from response
+									var AVSResult, valuearr = [];
+									if (typeof objAVSResult[0].childNodes[0].nodeValue != 'undefined') {
+									   AVSResultlength = objAVSResult[0].childNodes.length;
+									   for ( var i = 0; i < AVSResultlength; i++ ) {
+											var key = objAVSResult[0].childNodes[i].nodeName;
+											var value = xmldoc.getElementsByTagName(key)[0].childNodes[0].nodeValue;
+											valuearr.push(value);	
+									   }
+									   AVSResult = {"ActualResult" : valuearr[0], "AddressResult" : valuearr[1], "CountryResult" : valuearr[2], "StateResult" : valuearr[3], "PostalCodeResult" : valuearr[4], "PhoneResult" : valuearr[5], "CardholderNameResult" : valuearr[6], "CityResult" : valuearr[7]};
+									} else {
+									   Velocity.complete({'code': 24, 'text': 'AVSResult is not available in response' }, callbackfunction)
+									}
+									
+									cardSecurityData = {"AVSData": address, "CVResult": CVResult, "AVSResult": AVSResult};
 									if(StatusCode == '000'){
 									
-										var result={"PaymentAccountDataToken": paymentAccountDataToken, "CardSecurityData": cardSecurityData, "sessiontoken":sessiontoken};
+										var result = {"CardSecurityData": cardSecurityData, "PaymentAccountDataToken": paymentAccountDataToken};
 										result = JSON.stringify(result);
-										result = Nab.base64_encode(result);
-										Nab.complete({'code': 0, 'text': result}, callbackfunction);
+										result = Velocity.base64_encode(result);
+										Velocity.complete({'code': 0, 'text': result}, callbackfunction);
 
 									}else{
 									
-									    Nab.complete({'code': StatusCode, 'text': Status}, callbackfunction);
+									    Velocity.complete({'code': StatusCode, 'text': Status}, callbackfunction);
 									
 									}
                                 }
                             };
                             
-                            var XML = Nab.xml_creator(card, address, applicationprofileid, merchantprofileid);		
+                            var XML = Velocity.xml_creator(card, address, applicationprofileid, merchantprofileid);		
 
                             var xmldoc = (new DOMParser()).parseFromString(XML, "application/xml");
                             
@@ -151,12 +174,12 @@ var Nab = {
     
 	// Validate Card number with Length
 	valcard_num: function(cc_num) {
-        return Nab.mod10(cc_num) && cc_num.length != 0;
+        return Velocity.mod10(cc_num) && cc_num.length != 0;
     },
 	
 	// Validate Card cvv
     valcvv_num: function(cvv) {
-        return (cvv.length == 3 || cvv.length == 4);
+        return (cvv.length == 3);
     },
 	
 	// Validate Card Expiry date
@@ -189,7 +212,7 @@ var Nab = {
                     sessiontokenobj.open("GET", url);
                 }
                 catch(e) {
-                    Nab.complete({'code': 8, 'text': 'Ajax request error occured for session token request in IE8,9' }, callbackfunction);
+                    Velocity.complete({'code': 8, 'text': 'Ajax request error occured for session token request in IE8,9' }, callbackfunction);
                     throw e; // Rethrow to terminate execution
                 }
             }
@@ -224,7 +247,7 @@ var Nab = {
                     sid.open("GET", url);
                 }
                 catch(e) {
-                    Nab.complete({'code': 9, 'text': 'Ajax request error occured for service information request in IE8,9' }, callbackfunction)
+                    Velocity.complete({'code': 9, 'text': 'Ajax request error occured for service information request in IE8,9' }, callbackfunction)
                     throw e; // Rethrow to terminate execution
                 }
             }
@@ -259,7 +282,7 @@ var Nab = {
                     wid.open("POST", url);
                 }
                 catch(e) {
-                    Nab.complete({'code': 13, 'text': 'Ajax request error occured for verify AVS & card data request in IE8,9' }, callbackfunction)
+                    Velocity.complete({'code': 13, 'text': 'Ajax request error occured for verify AVS & card data request in IE8,9' }, callbackfunction)
                     throw e; // Rethrow to terminate execution
                 }
             }
@@ -326,10 +349,10 @@ var Nab = {
         XML	+= '<ns1:AVSData>';
         XML	+= '<ns1:CardholderName i:nil="true"/>';
         XML	+= '<ns1:Street>' + address.Street + '</ns1:Street>';
-        XML	+= '<ns1:City i:nil="true"/>';
-        XML	+= '<ns1:StateProvince i:nil="true"/>';
-        XML	+= '<ns1:PostalCode>' + parseInt(address.PostalCode) + '</ns1:PostalCode>';
-        XML	+= '<ns1:Phone i:nil="true"/>';
+        XML	+= '<ns1:City>'+ address.City +'</ns1:City>';
+        XML	+= '<ns1:StateProvince>'+address.StateProvince+'</ns1:StateProvince>';
+        XML	+= '<ns1:PostalCode>'+ parseInt(address.PostalCode) +'</ns1:PostalCode>';
+        XML	+= '<ns1:Phone>'+ address.Phone +'</ns1:Phone>';
         XML	+= '<ns1:Email i:nil="true"/>';
         XML	+= '</ns1:AVSData>';
         XML	+= '<ns1:CVDataProvided>Provided</ns1:CVDataProvided>';

@@ -1,6 +1,6 @@
 <?php
 
-class NorthAmericanBancard_Helpers{
+class Velocity_Helpers{
 
 	private function __construct() {}
 	private function __clone() {}
