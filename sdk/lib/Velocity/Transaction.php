@@ -1,7 +1,7 @@
 <?php
 /*
  * This class represents a Velocity Transaction.
- * It can be used to query and capture/undo/adjust/returnbyid/returnunlinked/authorizeandcapture transactions.
+ * It can be used to query and capture/undo/adjust/returnbyid/returnunlinked transactions.
  */
 
 class Velocity_Transaction 
@@ -33,6 +33,7 @@ class Velocity_Transaction
 	* Captures an authorization. Optionally specify an `$amount` to do a partial capture of the initial
 	* authorization. The default is to capture the full amount of the authorization.
 	* @param array $options this is hold the amount, transactionid, method name. 
+	* @return array $this->handleResponse($error, $response) array of successfull or failure of gateway response.
 	*/
 	public function capture($options = array()) {
 		
@@ -42,6 +43,7 @@ class Velocity_Transaction
 				$xml = Velocity_XmlCreator::cap_XML($options['TransactionId'], $amount);  // got capture xml object.  
 				$xml->formatOutput = TRUE;
 				$body = $xml->saveXML();
+				//echo '<xmp>'.$body.'</xmp>';
 				list($error, $response) = $this->connection->put(
 																	$this->path(
 																					VelocityCon::$workflowid, 
@@ -54,7 +56,7 @@ class Velocity_Transaction
 																			'method' => Velocity_Processor::$Txn_method[2]
 																		  )
 																);
-				//return $response;
+
 				return $this->handleResponse($error, $response);
 			} catch(Exception $e) {
 				throw new Exception($e->getMessage());
@@ -69,6 +71,7 @@ class Velocity_Transaction
 	* Adjust this transaction. If the transaction has not yet been captured and settled it can be Adjust to 
 	* A previously authorized amount (incremental or reversal) prior to capture and settlement. 
 	* @param array $options this is hold the amount, transactionid, method name.
+	* @return array $this->handleResponse($error, $response) array of successfull or failure of gateway response.
 	*/
 	public function adjust($options = array()) {
 		
@@ -106,10 +109,11 @@ class Velocity_Transaction
 	 * The Undo operation is used to release cardholder funds by performing a void (Credit Card) or reversal (PIN Debit) on a previously 
 	 * authorized transaction that has not been captured (flagged) for settlement.
 	 * @param array $options this is hold the amount, transactionid, method name.
+ 	 * @return array $this->handleResponse($error, $response) array of successfull or failure of gateway response.
 	 */
 	public function undo($options = array()) {
 		
-		if ( isset($options['TransactionId']) && isset($options['avsdata']) ) {
+		if ( isset($options['TransactionId']) ) {
 		
 			try {
 				$xml = Velocity_XmlCreator::undo_XML($options['TransactionId']);  // got undo xml object.  
@@ -138,10 +142,12 @@ class Velocity_Transaction
 		}
 	}
 	
+	
 	/*
 	 * The ReturnById operation is used to perform a linked credit to a cardholder’s account from the merchant’s account based on a
 	 * previously authorized and settled transaction.
 	 * @param array $options this is hold the transactionid, method name.
+	 * @return array $this->handleResponse($error, $response) array of successfull or failure of gateway response. 
 	 */
 	public function returnById($options = array()) {
 		
@@ -174,11 +180,13 @@ class Velocity_Transaction
 			throw new Exception(Velocity_Message::$descriptions['errreturntranidwid']);
 		}  
 	}
+
 	
 	/*
 	 * The ReturnUnlinked operation is used to perform an "unlinked", or standalone, credit to a cardholder’s account from the merchant’s account.
 	 * This operation is useful when a return transaction is not associated with a previously authorized and settled transaction.
 	 * @param array $options this array hold "amount, paymentAccountDataToken, avsData, carddata, invoice no., order no"
+	 * @return array $this->handleResponse($error, $response) array of successfull or failure of gateway response. 
 	 */
 	public function returnUnlinked($options = array()) {
 		
@@ -218,6 +226,7 @@ class Velocity_Transaction
 	 * @param string $arg1 part of url for request.
 	 * @param string $arg2 part of url for request.
 	 * @param string $arg3 name of method.
+	 * @return array $this->handleResponse($error, $response) array of successfull or failure of gateway response.	 
 	 */
 	private function path($arg1, $arg2, $rtype) {
 		if(isset($arg1) && isset($arg2) && isset($rtype) && ( $rtype == 'capture' || $rtype == 'adjust' || $rtype == 'undo' ) ) {
@@ -231,14 +240,16 @@ class Velocity_Transaction
 		}
 	}
 	
+	
 	/*
 	* Parses the Velocity response for messages (info or error) and updates 
 	* the current transaction's information. If an HTTP error is 
 	* encountered, it will be thrown from this method.
 	* @param array $error error message created on the basis of gateway error status. 
 	* @param array $response gateway response deatil. 
+	* @return object $error error detail of gateway response.
+    * @return array $response successfull/failure response of gateway.
 	*/
-
 	public function handleResponse($error, $response) {
 		if ($error) {
 			  return $error;
@@ -247,41 +258,5 @@ class Velocity_Transaction
 			  return $response;
 			}
 		}
-
-		
 	}
-
-	/* optional
-	 * Finds message blocks in the Velocity response, creates a `Velocity_Message`
-	 * object for each one and stores them in either the `messages` or the
-	 * `errors` internal array, depending on the message type.
-	 * @param array $response gateway response deatil.
-	 */
-	private function processResponseMessages($response = array()) {
-		$messages = self::extractMessagesFromResponse($response);  
-		$this->messages = array();
-		$this->errors = array();
-		// error processing according to needed in module of prestashop.
-		return $messages;
-	}
-
-	/*optional
-	* Finds all messages returned in a Velocity response, regardless of
-	* what part of the response they were in.
-	* @param array $response gateway response deatil.
-	*/
-	private static function extractMessagesFromResponse($response = array()) {
-		$message = '';
-		foreach ($response as $key => $value) {
-			if ( is_array($value) ) {
-				$message = self::extractMessagesFromResponse($value);
-			} else {
-				if($key == 'TransactionState') {
-					$message .= $key . ':' . $value;
-				}
-			}
-		}
-		return $message;
-	}
-
 }

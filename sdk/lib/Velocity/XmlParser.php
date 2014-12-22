@@ -9,6 +9,7 @@ class Velocity_XmlParser {
 	/* 
 	 * parse method use to parse the xml response pass into normalize method to convert into array.
 	 * @param xml $string detail of gateway response.	
+	 * @return array $result xml tags converted into array keys and values.
 	*/
 	public static function parse($string) {
 		$xml = simplexml_load_string($string);
@@ -20,6 +21,7 @@ class Velocity_XmlParser {
 	/* 
 	 * normalize method convert xml object into array.
 	 * @param string $object xml string of gateway response. 
+	 * @return array $result xml tags converted into array keys and values.
 	*/
 	private static function normalize($object, $inArray = false) {
 		$result = array();

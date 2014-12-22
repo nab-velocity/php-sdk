@@ -8,6 +8,8 @@ class Velocity_Helpers{
 
 	/*
 	 * Converts a string from camelCase to under_score notation.
+	 * @param string $string camelcase
+	 * @return string strtolower(preg_replace('/(?<=\\w)(?=[A-Z0-9])/', "_$1", $string)) converted into underscore string
 	 */
 	 
 	public static function underscore($string){

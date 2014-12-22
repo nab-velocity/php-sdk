@@ -5,6 +5,7 @@ class Velocity_XmlCreator {
 	/* 
 	 * create authorize xml as per the api format .
 	 * @param array $data this array hold "amount, paymentAccountDataToken, avsData, carddata, invoice no., order no"
+	 * @return string $xml xml format in string.
 	 */
 	public static function auth_XML($data) {
 	  
@@ -12,13 +13,13 @@ class Velocity_XmlCreator {
 		
 			$xml = new DOMDocument("1.0");
 
-			$root = $xml->createElement("AuthorizeAndCaptureTransaction");
+			$root = $xml->createElement("AuthorizeTransaction");
 
 			$xml->appendChild($root);
 
 			$root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:i', 'http://www.w3.org/2001/XMLSchema-instance');
 			$root->setAttribute('xmlns', 'http://schemas.ipcommerce.com/CWS/v2.0/Transactions/Rest');
-			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'AuthorizeAndCaptureTransaction');
+			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'AuthorizeTransaction');
 
 			$n = $xml->createElement("ApplicationProfileId");
 			$idText = $xml->createTextNode(VelocityCon::$applicationprofileid);
@@ -45,7 +46,7 @@ class Velocity_XmlCreator {
 			$n3->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
 			$n2->appendChild($n3);
 
-			if(isset($data['avsdata']['Street']) && isset($data['avsdata']['City']) && isset($data['avsdata']['StateProvince']) && isset($data['avsdata']['PostalCode']) && isset($data['avsdata']['Country'])) {
+			if(isset($data['avsdata']['Street']) && isset($data['avsdata']['City']) && isset($data['avsdata']['StateProvince']) && isset($data['avsdata']['PostalCode']) && isset($data['avsdata']['Country'])) { // check avsdata for authorize method.  
 			
 				$n3 = $xml->createElement("ns2:Address");
 				$n2->appendChild($n3);
@@ -79,7 +80,7 @@ class Velocity_XmlCreator {
 				$n4->appendChild($idText);
 				$n3->appendChild($n4);
 			
-			} else {
+			} else { 
 			
 				$n3 = $xml->createElement("ns2:Address");
 				$n3->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
@@ -139,7 +140,7 @@ class Velocity_XmlCreator {
 			$n1 = $xml->createElement("ns1:TenderData");
 			$n->appendChild($n1);
 
-			if ($data['token'] != '') {
+			if ($data['token'] != '') { //check paymentaccountdatatoken for authorize method.
 				$n2 = $xml->createElement("ns4:PaymentAccountDataToken");
 				$n2->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ns4', 'http://schemas.ipcommerce.com/CWS/v2.0/Transactions');
 				$idText = $xml->createTextNode($data['token']);
@@ -167,8 +168,8 @@ class Velocity_XmlCreator {
 			$n2->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
 			$n1->appendChild($n2);
 			
-			/* card data */
-			if ( $data['carddata']['cardtype'] != '' && $data['carddata']['pan'] != '' && $data['carddata']['expire'] != '' ) {
+			/* check card data for authorize method */
+			if ( $data['carddata']['cardtype'] != '' && $data['carddata']['pan'] != '' && $data['carddata']['expire'] != '' && $data['carddata']['cvv'] != '' ) {
 			
 				$n2 = $xml->createElement("ns1:CardData");
 				$n1->appendChild($n2);
@@ -188,15 +189,20 @@ class Velocity_XmlCreator {
 				$idText = $xml->createTextNode($data['carddata']['expire']);
 				$n3->appendChild($idText);
 				$n2->appendChild($n3);
+				
+				$n3 = $xml->createElement("ns1:CVData");
+				$idText = $xml->createTextNode($data['carddata']['cvv']);
+				$n3->appendChild($idText);
+				$n2->appendChild($n3);
 
-				if (isset($data['carddata']['track1data']) && $data['carddata']['track1data'] != '') {
+				if (isset($data['carddata']['track1data']) && $data['carddata']['track1data'] != '') { // check track1data for authorize method.
 				
 					$n3 = $xml->createElement("ns1:Track1Data");
 					$idText = $xml->createTextNode($data['carddata']['track1data']);
 					$n3->appendChild($idText);
 					$n2->appendChild($n3);
 					
-				} else if (isset($data['carddata']['track2data']) && $data['carddata']['track2data'] != '') {
+				} else if (isset($data['carddata']['track2data']) && $data['carddata']['track2data'] != '') { // check track2data for authorize method.
 				
 					$n3 = $xml->createElement("ns1:Track2Data");
 					$idText = $xml->createTextNode($data['carddata']['track2data']);
@@ -360,6 +366,7 @@ class Velocity_XmlCreator {
      * create capture xml as per the api format.
 	 * @param string $TransactionId this is get from response of authorize.
 	 * @param float $amount amount for capture	
+	 * @return string $xml xml format in string.
 	 */
 	public static function cap_XML($TransactionId, $amount){
 	    
@@ -410,6 +417,7 @@ class Velocity_XmlCreator {
      * create Adjust xml as per the api format.
 	 * @param string $TransactionId this is get from response of authorize.
 	 * @param float $amount amount for adjustment after capture.
+	 * @return string $xml xml format in string.
 	 */
 	public static function adjust_XML($TransactionId, $amount){
 	    
@@ -465,6 +473,7 @@ class Velocity_XmlCreator {
 	/* 
 	 * create authorizeandcapture xml as per the api format .
 	 * @param array $data this array hold "amount, paymentAccountDataToken, avsData, carddata, invoice no., order no"
+	 * @return string $xml xml format in string.
 	 */
 	public static function authandcap_XML($data) {
 	
@@ -505,7 +514,7 @@ class Velocity_XmlCreator {
 			$n3->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
 			$n2->appendChild($n3);
 
-			if(isset($data['avsdata']['Street']) && isset($data['avsdata']['City']) && isset($data['avsdata']['StateProvince']) && isset($data['avsdata']['PostalCode']) && isset($data['avsdata']['Country'])) {
+			if(isset($data['avsdata']['Street']) && isset($data['avsdata']['City']) && isset($data['avsdata']['StateProvince']) && isset($data['avsdata']['PostalCode']) && isset($data['avsdata']['Country'])) { // check avsdata for authandcap method.
 			
 				$n3 = $xml->createElement("ns2:Address");
 				$n2->appendChild($n3);
@@ -599,7 +608,7 @@ class Velocity_XmlCreator {
 			$n1 = $xml->createElement("ns1:TenderData");
 			$n->appendChild($n1);
 
-			if ($data['token'] != '') {
+			if ($data['token'] != '') { // check PaymentAccountDataToken for authandcap method.
 				$n2 = $xml->createElement("ns4:PaymentAccountDataToken");
 				$n2->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ns4', 'http://schemas.ipcommerce.com/CWS/v2.0/Transactions');
 				$idText = $xml->createTextNode($data['token']);
@@ -627,8 +636,8 @@ class Velocity_XmlCreator {
 			$n2->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
 			$n1->appendChild($n2);
 			
-			/* card data */
-			if ( $data['carddata']['cardtype'] != '' && $data['carddata']['pan'] != '' && $data['carddata']['expire'] != '' ) {
+			/*  check card data for authandcap method. */
+			if ( $data['carddata']['cardtype'] != '' && $data['carddata']['pan'] != '' && $data['carddata']['expire'] != '' && $data['carddata']['cvv'] != '' ) {
 			
 				$n2 = $xml->createElement("ns1:CardData");
 				$n1->appendChild($n2);
@@ -648,15 +657,20 @@ class Velocity_XmlCreator {
 				$idText = $xml->createTextNode($data['carddata']['expire']);
 				$n3->appendChild($idText);
 				$n2->appendChild($n3);
+				
+				$n3 = $xml->createElement("ns1:CVData");
+				$idText = $xml->createTextNode($data['carddata']['cvv']);
+				$n3->appendChild($idText);
+				$n2->appendChild($n3);
 
-				if (isset($data['carddata']['track1data']) && $data['carddata']['track1data'] != '') {
+				if (isset($data['carddata']['track1data']) && $data['carddata']['track1data'] != '') { // check track1data for authandcap method.
 				
 					$n3 = $xml->createElement("ns1:Track1Data");
 					$idText = $xml->createTextNode($data['carddata']['track1data']);
 					$n3->appendChild($idText);
 					$n2->appendChild($n3);
 					
-				} else if (isset($data['carddata']['track2data']) && $data['carddata']['track2data'] != '') {
+				} else if (isset($data['carddata']['track2data']) && $data['carddata']['track2data'] != '') { // check track1data for authandcap method.
 				
 					$n3 = $xml->createElement("ns1:Track2Data");
 					$idText = $xml->createTextNode($data['carddata']['track2data']);
@@ -819,6 +833,7 @@ class Velocity_XmlCreator {
 	/* 
      * create Undo xml as per the api format.
 	 * @param string $TransactionId this is get from response of authorize.
+	 * @return string $xml xml format in string.
 	 */
 	public static function undo_XML($TransactionId) {
 	    
@@ -867,6 +882,7 @@ class Velocity_XmlCreator {
      * create ReturnById xml as per the api format.
 	 * @param string $TransactionId this is get from response of authorize.
 	 * @param float $amount amount for return.	
+	 * @return string $xml xml format in string.
 	 */
 	public static function returnById_XML($amount, $TransactionId){
 	    
@@ -920,6 +936,7 @@ class Velocity_XmlCreator {
 	/* 
      * create ReturnUnlinked xml as per the api format.
 	 * @param array $data this array hold "amount, paymentAccountDataToken, avsData, carddata, invoice no., order no"
+	 * @return string $xml xml format in string.
 	 */
 	public static function returnunlinked_XML($data){
 
@@ -927,13 +944,13 @@ class Velocity_XmlCreator {
 		
 			$xml = new DOMDocument("1.0");
 
-			$root = $xml->createElement("AuthorizeAndCaptureTransaction");
+			$root = $xml->createElement("ReturnTransaction");
 
 			$xml->appendChild($root);
 
 			$root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:i', 'http://www.w3.org/2001/XMLSchema-instance');
 			$root->setAttribute('xmlns', 'http://schemas.ipcommerce.com/CWS/v2.0/Transactions/Rest');
-			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'AuthorizeAndCaptureTransaction');
+			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'ReturnTransaction');
 
 			$n = $xml->createElement("ApplicationProfileId");
 			$idText = $xml->createTextNode(VelocityCon::$applicationprofileid);
@@ -960,7 +977,7 @@ class Velocity_XmlCreator {
 			$n3->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
 			$n2->appendChild($n3);
 
-			if(isset($data['avsdata']['Street']) && isset($data['avsdata']['City']) && isset($data['avsdata']['StateProvince']) && isset($data['avsdata']['PostalCode']) && isset($data['avsdata']['Country'])) {
+			if(isset($data['avsdata']['Street']) && isset($data['avsdata']['City']) && isset($data['avsdata']['StateProvince']) && isset($data['avsdata']['PostalCode']) && isset($data['avsdata']['Country'])) { // check avsdata for authorize method.
 			
 				$n3 = $xml->createElement("ns2:Address");
 				$n2->appendChild($n3);
@@ -1054,7 +1071,7 @@ class Velocity_XmlCreator {
 			$n1 = $xml->createElement("ns1:TenderData");
 			$n->appendChild($n1);
 
-			if ($data['token'] != '') {
+			if ($data['token'] != '') { // check PaymentAccountDataToken for returnunlinked method.
 				$n2 = $xml->createElement("ns4:PaymentAccountDataToken");
 				$n2->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ns4', 'http://schemas.ipcommerce.com/CWS/v2.0/Transactions');
 				$idText = $xml->createTextNode($data['token']);
@@ -1082,8 +1099,8 @@ class Velocity_XmlCreator {
 			$n2->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
 			$n1->appendChild($n2);
 			
-			/* card data */
-			if ( $data['carddata']['cardtype'] != '' && $data['carddata']['pan'] != '' && $data['carddata']['expire'] != '' ) {
+			
+			if ( $data['carddata']['cardtype'] != '' && $data['carddata']['pan'] != '' && $data['carddata']['expire'] != '' && $data['carddata']['cvv'] != '' ) { // check card data for returnunlinked method.
 			
 				$n2 = $xml->createElement("ns1:CardData");
 				$n1->appendChild($n2);
@@ -1092,7 +1109,6 @@ class Velocity_XmlCreator {
 				$idText = $xml->createTextNode($data['carddata']['cardtype']);
 				$n3->appendChild($idText);
 				$n2->appendChild($n3);
-
 
 				$n3 = $xml->createElement("ns1:PAN");
 				$idText = $xml->createTextNode($data['carddata']['pan']);
@@ -1103,15 +1119,20 @@ class Velocity_XmlCreator {
 				$idText = $xml->createTextNode($data['carddata']['expire']);
 				$n3->appendChild($idText);
 				$n2->appendChild($n3);
+				
+				$n3 = $xml->createElement("ns1:CVData");
+				$idText = $xml->createTextNode($data['carddata']['cvv']);
+				$n3->appendChild($idText);
+				$n2->appendChild($n3);
 
-				if (isset($data['carddata']['track1data']) && $data['carddata']['track1data'] != '') {
+				if (isset($data['carddata']['track1data']) && $data['carddata']['track1data'] != '') { // check track1data for returnunlinked method.
 				
 					$n3 = $xml->createElement("ns1:Track1Data");
 					$idText = $xml->createTextNode($data['carddata']['track1data']);
 					$n3->appendChild($idText);
 					$n2->appendChild($n3);
 					
-				} else if (isset($data['carddata']['track2data']) && $data['carddata']['track2data'] != '') {
+				} else if (isset($data['carddata']['track2data']) && $data['carddata']['track2data'] != '') { // check track2data for returnunlinked method.
 				
 					$n3 = $xml->createElement("ns1:Track2Data");
 					$idText = $xml->createTextNode($data['carddata']['track2data']);

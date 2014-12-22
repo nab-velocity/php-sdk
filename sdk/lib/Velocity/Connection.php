@@ -23,6 +23,7 @@ class Velocity_Connection
 	 *
 	 * @param string $path the relative url of request at gateway. 
 	 * @param array $data the array holds xml data , session token and gateway request method name.
+	 * @return array $this->request('GET', $path, $data) gateway response for both success or failure.
 	 */
 	public function get($path, $data = array()) {
 		if (isset($path) && isset($data)) {
@@ -37,6 +38,7 @@ class Velocity_Connection
 	 *
 	 * @param string $path the relative url of request at gateway. 
 	 * @param array $data the array holds xml data , session token and gateway request method name.
+	 * @return array $this->request('POST', $path, $data) gateway response for both success or failure.	 
 	 */
 	public function post($path, $data = array()) {
 		if (isset($path) && isset($data)) {
@@ -51,9 +53,10 @@ class Velocity_Connection
 	 *
 	 * @param string $path the relative url of request at gateway. 
 	 * @param array $data the array holds xml data , session token and gateway request method name.
+	 * @return array $this->request('PUT', $path, $data) gateway response for both success or failure.		 
 	 */
 	public function put($path, $data = array()) {
-		if (isset($path) && isset($data)) {
+		if (isset($path) && isset($data)) { 
 			return $this->request('PUT', $path, $data);
 		} else {
 			throw new Exception($data['method'].':'.Velocity_Message::$descriptions['errputmethod']);
@@ -67,6 +70,7 @@ class Velocity_Connection
 	 * @param string $method the method of request(Like GET, POST etc).
 	 * @param string $path the relative url of request at gateway. 
 	 * @param array $data the array holds xml data , session token and gateway request method name.
+	 * @return array array($error, $response) gateway response for both success or failure.		 
 	 */
 	private function request($method, $path, $data = array()) {
 
@@ -172,19 +176,21 @@ class Velocity_Connection
 		if (preg_match('/json/', $contentType)) {
 			$response = json_decode($body, true); 
 		} elseif (preg_match('/xml/', $contentType)) {
-		    $arr = explode('Path=/',$body);
+		    $arr = explode('Path=/', $body);
 			if(isset($arr[1]))
 			   $response = Velocity_XmlParser::parse($arr[1]);
 			else
 			   $response = Velocity_XmlParser::parse($body);
 		}
-		
+
 		return array($error, $response);
 	 
 	}
 	
 	/*
-   * Returns an error object, corresponding to the HTTP status code returned by Velocity.
+     * Returns an error object, corresponding to the HTTP status code returned by Velocity.
+	 * @param int $status error code.
+	 * @return object (null/Exception child class object) this is error detail of gateway response. 
 	 */
 	 
 	private static function errorFromStatus($status) {

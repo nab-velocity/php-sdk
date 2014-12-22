@@ -1,10 +1,14 @@
 <?php
-
+/*
+ * This class represents a Velocity Transaction.
+ * It can be used to query and authorize/authandcap transactions.
+ */
+ 
 class Velocity_Processor 
 {
 	public static $sessionToken;
 	private $connection;
-	public static $Txn_method = array('authorize', 'authorizeandcapture', 'capture', 'adjust', 'undo', 'returnbyid', 'returnunlinked');
+	public static $Txn_method = array('authorize', 'authorizeandcapture', 'capture', 'adjust', 'undo', 'returnbyid', 'returnunlinked'); // array of method name to identify method request for common process.
 	
 	public static $processorinstance;
 	
@@ -24,6 +28,7 @@ class Velocity_Processor
 	* Returns a `$sessionToken` genrate by identitytoken.
 	*
 	* @param string $identitytoken this is identity token provided by gateway. 
+	* @return string $sessionToken session token is velocity security token.
 	*/
 	public static function signOn($identitytoken) {
 		$response = Velocity_Processor::curl_json('', VelocityCon::$site.'SvcInfo/token', 'GET', $identitytoken);
@@ -45,6 +50,7 @@ class Velocity_Processor
 	* This Method create corresponding xml for gateway request.
 	* This Method Reqest send to gateway and handle the response.
 	* @param array $options this array hold "amount, paymentAccountDataToken, avsData, carddata, invoice no., order no"
+	* @return array $this->handleResponse($error, $response) array of successfull or failure of gateway response. 
 	*/
 	
 	public function authorize($options = array()) {
@@ -55,6 +61,7 @@ class Velocity_Processor
 				$xml = Velocity_XmlCreator::auth_XML($options);  // got authorize xml object.
 				$xml->formatOutput = TRUE;
 				$body = $xml->saveXML();
+				//echo '<xmp>'.$body.'</xmp>';
 				list($error, $response) = $this->connection->post(
 																	$this->path(
 																		VelocityCon::$workflowid, 
@@ -82,6 +89,7 @@ class Velocity_Processor
 	 * Authorizeandcapture operation is used to authorize transactions by performing a check on cardholder's funds and reserves.  
 	 * The authorization amount if sufficient funds are available.  
 	 * @param array $options this array hold "amount, paymentAccountDataToken, avsData, carddata, invoice no., order no"
+	 * @return array $this->handleResponse($error, $response) array of successfull or failure of gateway response. 	 
 	 */
 	public function authorizeAndCapture($options = array()) { 
 		
@@ -93,7 +101,7 @@ class Velocity_Processor
 				$xml = Velocity_XmlCreator::authandcap_XML($options);  // got authorizeandcapture xml object. 
 				$xml->formatOutput = TRUE;
 				$body = $xml->saveXML();
-				//echo '<xmp>'.$body.'</xmp>'; die;
+				//echo '<xmp>'.$body.'</xmp>';
 				list($error, $response) = $this->connection->post(
 																	$this->path(
 																		VelocityCon::$workflowid, 
@@ -138,6 +146,7 @@ class Velocity_Processor
 	* request.
 	* @param array $error error message created on the basis of gateway error status. 
 	* @param array $response gateway response deatil. 
+	* @return array $transaction_response array of successfull or failure of gateway response. 	
 	*/
 
 	private function handleResponse($error, $response) { 
@@ -151,6 +160,9 @@ class Velocity_Processor
 	 * @param string $api_url base url of gateway request.
 	 * @param string $rest_action method name of request.
 	 * @param string $session_token identity token provided by velocity.
+	 * @return array array($response, $info, $data) array of successfull or failure of gateway response.
+	 * @return array array($response, $info) array of successfull or failure of gateway response.
+     * @return object $fault fault of gateway error message and/or detail.	 
 	 */
 	private static function curl_json($body , $api_url, $rest_action, $session_token='', $timeout=60) {
 		$user_agent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)";
