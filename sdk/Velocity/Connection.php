@@ -26,9 +26,9 @@ class Velocity_Connection
 	 * @return array $this->request('GET', $path, $data) gateway response for both success or failure.
 	 */
 	public function get($path, $data = array()) {
-		if (isset($path) && isset($data)) {
+		if (isset($path) && isset($data)) {	
 			return $this->request('GET', $path, $data);
-		} else {
+		} else {	
 			throw new Exception($data['method'].':'.Velocity_Message::$descriptions['errgetmethod']);
 		}
 	}
@@ -40,7 +40,7 @@ class Velocity_Connection
 	 * @param array $data the array holds xml data , session token and gateway request method name.
 	 * @return array $this->request('POST', $path, $data) gateway response for both success or failure.	 
 	 */
-	public function post($path, $data = array()) {
+	public function post($path, $data = array()) { 
 		if (isset($path) && isset($data)) {
 			return $this->request('POST', $path, $data);
 		} else {
@@ -64,6 +64,30 @@ class Velocity_Connection
 	}
 
 	/*
+	 * SignOn method genrate the session token by passing the identitytoken.
+	 * @return array $this->handleResponse($error, $response) array of successfull or failure of gateway response. 
+	 */
+	public function signOn() {
+		try { 
+														
+			list($error, $response) = $this->get('SvcInfo/token', 
+													array(
+														'sessiontoken' => Velocity_Processor::$identitytoken, 
+														'xml' => '', 
+														'method' => 'SignOn'
+													)
+												 ); 
+			if ( $error == NULL && $response != '' )
+			          
+				return $response;
+			else
+				throw new Exception( Velocity_Message::$descriptions['errsignon'] );
+		} catch (Exception $e) {
+			throw new Exception( $e->getMessage() );
+		}
+	}
+	
+	/*
      * Performs a GET/POST/PUT request to the Velocity API, parses the returned response
 	 * and then returns it.
 	 *
@@ -74,16 +98,20 @@ class Velocity_Connection
 	 */
 	private function request($method, $path, $data = array()) {
 
-		if (isset($data['xml']) && isset($data['sessiontoken']) && isset($path)) {
+		if (isset($data['sessiontoken']) && isset($path)) {
 			$body = $data['xml'];	
 			$session_token = $data['sessiontoken'];
 			$rest_action = $method;
-			$api_url = VelocityCon::$site . $path;
+			if ( Velocity_Processor::$isTestAccount ) {
+				$api_url = Velocity_Config::$baseurl_test . $path;
+			} else {
+				$api_url = Velocity_Config::$baseurl_live . $path;
+			}
 			$timeout = 60;
 		} else {
 			throw new Exception($data['method'].':'.Velocity_Message::$descriptions['errsessionxmlnotset']);
 		}
-
+		
 		$user_agent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)";
 		
 		// Parse the full api_url for required pieces. 
@@ -108,7 +136,12 @@ class Velocity_Connection
 		
 		// Header setup		
 		$header[] = 'Authorization: Basic '. base64_encode($session_token.':');
-		$header[] = 'Content-Type: application/xml';
+		
+		if($data['method'] == 'SignOn')
+			$header[] = 'Content-Type: application/json';
+		else
+			$header[] = 'Content-Type: application/xml';
+			
 		$header[] = 'Accept: '; // Known issue: defining this causes server to reply with no content.
 		$header[] = 'Expect: 100-continue';
 		$header[] = 'Host: '.$host;
@@ -137,30 +170,23 @@ class Velocity_Connection
 			$expected_response = "200";
 		
 		$res = curl_exec($ch);
-		list($header, $body) = explode("\r\n\r\n", $res, 2);
 		
-
-		if ( VelocityCon::$debug ) {   // print the response and error for debug
-			echo "\n--------- Response ----------\n<br>";
-			echo '<pre>'; print_r($header); echo '</pre>';
-			echo "\n<br>";
-			echo '<xmp>'.$body.'</xmp>';
-			echo "\n-----------------------------\n<br>";
-		}
-
+		list($header, $body) = explode("\r\n\r\n", $res, 2);
+			
 		$statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+		
+		/* if ( $data['method'] == 'SignOn' && $body != '' )
+			return $body; */
+		
 		if ( $statusCode == 5000 ) {  // regenrate the sessiontoken if expired.
-			new Velocity_Processor(VelocityCon::$identitytoken);
-			if (!gc_enabled()) { // unused memory allocation release from memory 
-				gc_enable();
-			}
-			$data['sessiontoken'] = Velocity_Processor::$sessionToken;
+		
+			$data['sessiontoken'] = $this->signOn();
 			$this->request($method, $path, $data);
 			
 		} else {
 			$error = self::errorFromStatus($statusCode); // call exception classes according to error code.
 		}
-
 		$match = null;
 		preg_match('/Content-Type: ([^;]*);/i', $body, $match);
 		$contentType;

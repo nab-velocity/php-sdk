@@ -73,8 +73,8 @@
         <div id="container">
             <div id="result"></div> 
 
-            <!-- tokenlistener is any page that can extract VelocityToken from the post (PHP example: $_POST['VelocityToken']) -->
-            <form action="sdk/NABClients.php" method="POST" id="payment">
+            <!-- tokenlistener is any page that can extract NabToken from the post (PHP example: $_POST['NabToken']) -->
+            <form action="velocityClients.php" method="POST" id="payment">
 	
                 <div>
                     <label>Card holder name</label>
@@ -101,7 +101,7 @@
                 </div>
                 <div>
                     <label>Country</label>
-                    <input id="country" size="30" type="text" value="india" />
+                    <input id="country" size="30" type="text" value="USA" />
                 </div>
                 <div>
                     <label>Email</label>

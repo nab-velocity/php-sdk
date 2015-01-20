@@ -3,6 +3,181 @@
 class Velocity_XmlCreator {
 
 	/* 
+	 * create verify xml as per the api format .
+	 * @param array $data this array hold "avsData, carddata"
+	 * @return string $xml xml format in string.
+	 */
+	public static function verify_XML($data) {
+
+	    if ( isset($data['carddata']) && isset($data['avsdata']) ) {
+		
+			$xml = new DOMDocument("1.0");
+
+			$root = $xml->createElement("AuthorizeTransaction");
+
+			$xml->appendChild($root);
+
+			$root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:i', 'http://www.w3.org/2001/XMLSchema-instance');
+			$root->setAttribute('xmlns', 'http://schemas.ipcommerce.com/CWS/v2.0/Transactions/Rest');
+			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'AuthorizeTransaction');
+
+			$n = $xml->createElement("ApplicationProfileId");
+			$idText = $xml->createTextNode(Velocity_Processor::$applicationprofileid);
+			$n->appendChild($idText);
+			$root->appendChild($n);
+
+			$n = $xml->createElement("MerchantProfileId");
+			$idText = $xml->createTextNode(Velocity_Processor::$merchantprofileid);
+			$n->appendChild($idText);
+			$root->appendChild($n);
+
+			$n = $xml->createElement("Transaction");
+			$n->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ns1', 'http://schemas.ipcommerce.com/CWS/v2.0/Transactions/Bankcard');
+			$n->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'ns1:BankcardTransaction');
+			$root->appendChild($n);
+			
+			$n1 = $xml->createElement("ns1:TenderData");
+			$n->appendChild($n1);
+			
+			$n2 = $xml->createElement("ns1:CardData");
+			$n1->appendChild($n2);
+			
+			$n3 = $xml->createElement("ns1:CardType");
+			$idText = $xml->createTextNode($data['carddata']['cardtype']);
+			$n3->appendChild($idText);
+			$n2->appendChild($n3);
+			
+			$n3 = $xml->createElement("ns1:CardholderName");
+			$idText = $xml->createTextNode($data['carddata']['cardowner']);
+			$n3->appendChild($idText);
+			$n2->appendChild($n3);
+
+			$n3 = $xml->createElement("ns1:PAN");
+			$idText = $xml->createTextNode($data['carddata']['pan']);
+			$n3->appendChild($idText);
+			$n2->appendChild($n3);
+
+			$n3 = $xml->createElement("ns1:Expire");
+			$idText = $xml->createTextNode($data['carddata']['expire']);
+			$n3->appendChild($idText);
+			$n2->appendChild($n3);
+			
+			if (isset($data['carddata']['track1data']) && $data['carddata']['track1data'] != '') { // check track1data for authorize method.
+				
+				$n3 = $xml->createElement("ns1:Track1Data");
+				$idText = $xml->createTextNode($data['carddata']['track1data']);
+				$n3->appendChild($idText);
+				$n2->appendChild($n3);
+				
+			} else if (isset($data['carddata']['track2data']) && $data['carddata']['track2data'] != '') { // check track2data for authorize method.
+			
+				$n3 = $xml->createElement("ns1:Track2Data");
+				$idText = $xml->createTextNode($data['carddata']['track2data']);
+				$n3->appendChild($idText);
+				$n2->appendChild($n3);
+				
+			} else {
+			
+				$n3 = $xml->createElement("ns1:Track1Data");
+				$n3->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
+				$n2->appendChild($n3);
+				
+				$n3 = $xml->createElement("ns1:Track2Data");
+				$n3->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
+				$n2->appendChild($n3);
+				
+			}
+			
+			$n2 = $xml->createElement("ns1:CardSecurityData");
+			$n1->appendChild($n2);
+			
+			$n3 = $xml->createElement("ns1:AVSData");
+			$n2->appendChild($n3);
+			
+			$n4 = $xml->createElement("ns1:Street");
+			$idText = $xml->createTextNode($data['avsdata']['Street']);
+			$n4->appendChild($idText);
+			$n3->appendChild($n4);
+
+			$n4 = $xml->createElement("ns1:City");
+			$idText = $xml->createTextNode($data['avsdata']['City']);
+			$n4->appendChild($idText);
+			$n3->appendChild($n4);
+
+			$n4 = $xml->createElement("ns1:StateProvince");
+			$idText = $xml->createTextNode($data['avsdata']['StateProvince']);
+			$n4->appendChild($idText);
+			$n3->appendChild($n4);
+
+			$n4 = $xml->createElement("ns1:PostalCode");
+			$idText = $xml->createTextNode($data['avsdata']['PostalCode']);
+			$n4->appendChild($idText);
+			$n3->appendChild($n4);
+
+			$n4 = $xml->createElement("ns1:CountryCode");
+			$idText = $xml->createTextNode($data['avsdata']['Country']);
+			$n4->appendChild($idText);
+			$n3->appendChild($n4);
+			
+			$n4 = $xml->createElement("ns1:Phone");
+			$n4->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
+			$n3->appendChild($n4);
+			
+			$n4 = $xml->createElement("ns1:Email");
+			$n4->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
+			$n3->appendChild($n4);
+			
+			$n3 = $xml->createElement("ns1:CVDataProvided");
+			$idText = $xml->createTextNode('Provided');
+			$n3->appendChild($idText);
+			$n2->appendChild($n3);
+			
+			$n3 = $xml->createElement("ns1:CVData");
+			$idText = $xml->createTextNode($data['carddata']['cvv']);
+			$n3->appendChild($idText);
+			$n2->appendChild($n3);
+			
+			$n3 = $xml->createElement("ns1:KeySerialNumber");
+			$n3->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
+			$n2->appendChild($n3);
+			
+			$n3 = $xml->createElement("ns1:PIN");
+			$n3->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
+			$n2->appendChild($n3);
+			
+			$n3 = $xml->createElement("ns1:IdentificationInformation");
+			$n3->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
+			$n2->appendChild($n3);
+			
+			$n2 = $xml->createElement("ns1:EcommerceSecurityData");
+			$n3->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:nil', 'true');
+			$n1->appendChild($n2);
+			
+			$n1 = $xml->createElement("ns1:TransactionData");
+			$n->appendChild($n1);
+			
+			$n2 = $xml->createElement("ns1:AccountType");
+			$idText = $xml->createTextNode('NotSet');
+			$n2->appendChild($idText);
+			$n1->appendChild($n2);
+			
+			$n2 = $xml->createElement("ns1:EntryMode");
+			$idText = $xml->createTextNode('Keyed');
+			$n2->appendChild($idText);
+			$n1->appendChild($n2);
+			
+			$n2 = $xml->createElement("ns1:IndustryType");
+			$idText = $xml->createTextNode('Ecommerce');
+			$n2->appendChild($idText);
+			$n1->appendChild($n2);
+
+			return $xml;
+		} else {
+			throw new Exception(Velocity_Message::$descriptions['errauthxml']);
+		}	
+	}	
+			
+	/* 
 	 * create authorize xml as per the api format .
 	 * @param array $data this array hold "amount, paymentAccountDataToken, avsData, carddata, invoice no., order no"
 	 * @return string $xml xml format in string.
@@ -22,12 +197,12 @@ class Velocity_XmlCreator {
 			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'AuthorizeTransaction');
 
 			$n = $xml->createElement("ApplicationProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$applicationprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$applicationprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 
 			$n = $xml->createElement("MerchantProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$merchantprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$merchantprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 
@@ -76,7 +251,7 @@ class Velocity_XmlCreator {
 				$n3->appendChild($n4);
 
 				$n4 = $xml->createElement("ns2:CountryCode");
-				$idText = $xml->createTextNode('USA');
+				$idText = $xml->createTextNode($data['avsdata']['Country']);
 				$n4->appendChild($idText);
 				$n3->appendChild($n4);
 			
@@ -381,7 +556,7 @@ class Velocity_XmlCreator {
 			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'Capture');
 			
 			$n = $xml->createElement("ApplicationProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$applicationprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$applicationprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 			
@@ -432,7 +607,7 @@ class Velocity_XmlCreator {
 			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'Adjust');
 			
 			$n = $xml->createElement("ApplicationProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$applicationprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$applicationprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 			
@@ -442,7 +617,7 @@ class Velocity_XmlCreator {
 			$root->appendChild($n);
 			
 			$n = $xml->createElement("MerchantProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$merchantprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$merchantprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 			
@@ -490,12 +665,12 @@ class Velocity_XmlCreator {
 			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'AuthorizeAndCaptureTransaction');
 
 			$n = $xml->createElement("ApplicationProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$applicationprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$applicationprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 
 			$n = $xml->createElement("MerchantProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$merchantprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$merchantprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 
@@ -544,7 +719,7 @@ class Velocity_XmlCreator {
 				$n3->appendChild($n4);
 
 				$n4 = $xml->createElement("ns2:CountryCode");
-				$idText = $xml->createTextNode('USA');
+				$idText = $xml->createTextNode($data['avsdata']['Country']);
 				$n4->appendChild($idText);
 				$n3->appendChild($n4);
 			
@@ -848,7 +1023,7 @@ class Velocity_XmlCreator {
 			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'Undo');
 			
 			$n = $xml->createElement("ApplicationProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$applicationprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$applicationprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 			
@@ -863,7 +1038,7 @@ class Velocity_XmlCreator {
 			$root->appendChild($n);
 		
 			$n = $xml->createElement("MerchantProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$merchantprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$merchantprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 			
@@ -897,7 +1072,7 @@ class Velocity_XmlCreator {
 			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'ReturnById');
 			
 			$n = $xml->createElement("ApplicationProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$applicationprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$applicationprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 			
@@ -923,7 +1098,7 @@ class Velocity_XmlCreator {
 			$n->appendChild($n1);
 
 			$n = $xml->createElement("MerchantProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$merchantprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$merchantprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 			
@@ -944,21 +1119,21 @@ class Velocity_XmlCreator {
 		
 			$xml = new DOMDocument("1.0");
 
-			$root = $xml->createElement("ReturnTransaction");
+			$root = $xml->createElement("AuthorizeAndCaptureTransaction");
 
 			$xml->appendChild($root);
 
 			$root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:i', 'http://www.w3.org/2001/XMLSchema-instance');
 			$root->setAttribute('xmlns', 'http://schemas.ipcommerce.com/CWS/v2.0/Transactions/Rest');
-			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'ReturnTransaction');
+			$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'AuthorizeAndCaptureTransaction');
 
 			$n = $xml->createElement("ApplicationProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$applicationprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$applicationprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 
 			$n = $xml->createElement("MerchantProfileId");
-			$idText = $xml->createTextNode(VelocityCon::$merchantprofileid);
+			$idText = $xml->createTextNode(Velocity_Processor::$merchantprofileid);
 			$n->appendChild($idText);
 			$root->appendChild($n);
 
@@ -1007,7 +1182,7 @@ class Velocity_XmlCreator {
 				$n3->appendChild($n4);
 
 				$n4 = $xml->createElement("ns2:CountryCode");
-				$idText = $xml->createTextNode('USA');
+				$idText = $xml->createTextNode($data['avsdata']['Country']);
 				$n4->appendChild($idText);
 				$n3->appendChild($n4);
 			
