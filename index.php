@@ -2,7 +2,7 @@
     <head>
         <title>JS API Test</title>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js" type="text/javascript"></script>
-        <script src="transparent_js.js" type="text/javascript"></script>
+        <script src="https://api.cert.nabcommerce.com/1.0/velocity.js" type="text/javascript"></script>
         <script type="text/javascript">
             $(document).ready(function() {
             

@@ -82,7 +82,7 @@ class Velocity_Processor
 	 */
 	public function authorizeAndCapture($options = array()) { 
 
-		if(isset($options['amount']) && isset($options['token'])) {
+		if(isset($options['amount']) && ((isset($options['token']) || isset($options['carddata'])) || isset($options['carddata']))) {
 			$amount = number_format($options['amount'], 2, '.', '');
 			$options['amount'] = $amount;
 			try {
@@ -124,7 +124,7 @@ class Velocity_Processor
 	*/
 	
 	public function authorize($options = array()) {
-		if(isset($options['amount']) && isset($options['token']) && isset($options['avsdata'])) {
+		if(isset($options['amount']) && (isset($options['token']) || isset($options['carddata'])) && isset($options['avsdata'])) {
 		$amount = number_format($options['amount'], 2, '.', '');
 		$options['amount'] = $amount;
 			try {
@@ -316,7 +316,7 @@ class Velocity_Processor
 	 */
 	public function returnUnlinked($options = array()) {
 		
-		if(isset($options['amount']) && isset($options['token'])) {
+		if(isset($options['amount']) && (isset($options['token']) || isset($options['carddata']))) {
 			$amount = number_format($options['amount'], 2, '.', '');
 			$options['amount'] = $amount;
 			try {
