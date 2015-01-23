@@ -82,7 +82,7 @@ class Velocity_Processor
 	 */
 	public function authorizeAndCapture($options = array()) { 
 
-		if(isset($options['amount']) && ((isset($options['token']) || isset($options['carddata'])) || isset($options['carddata']))) {
+		if(isset($options['amount']) && ((isset($options['token']) || isset($options['carddata'])) || isset($options['avsdata']))) {
 			$amount = number_format($options['amount'], 2, '.', '');
 			$options['amount'] = $amount;
 			try {
