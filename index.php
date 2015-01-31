@@ -3,6 +3,7 @@
         <title>JS API Test</title>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js" type="text/javascript"></script>
         <script src="https://api.cert.nabcommerce.com/1.0/velocity.js" type="text/javascript"></script>
+
         <script type="text/javascript">
             $(document).ready(function() {
             
@@ -13,11 +14,13 @@
 					var workflowid = 2317000001;
                      
                     var  card = {
-					        CardholderName: $("#card_holder_name").val(), cardtype: $("#cardtype").val(), number: $("#cc-number").val(), cvc: $("#cc-cvc").val(), expMonth: $("#cc-exp-month").val(), expYear: $("#cc-exp-year").val()
+					        CardholderName: $("#card_holder_name").val(), cardtype: $("#cardtype").val(), number: $("#pan").val(), 
+							cvc: $("#cvc").val(), expMonth: $("#exp-mo").val(), expYear: $("#exp-year").val()
                     };
                                  
                     var  address = {
-                            Street: $("#street").val(), City: $("#city").val(), StateProvince: $("#state").val(), PostalCode: $("#zip").val(), Country: $("#country").val(), Phone: $("#phone").val()
+                            Street: $("#street").val(),
+							PostalCode: $("#zip").val()
                     };
 
                     Velocity.tokenizeForm(identitytoken, card, address, applicationprofileid, merchantprofileid, workflowid, responseHandler);
@@ -44,7 +47,7 @@
                 }
             });
         </script>
-        
+     
         <style>
             div#container{
                 border: 1px solid #009cc3;
@@ -71,64 +74,37 @@
     </head>
     <body>
         <div id="container">
-            <div id="result"></div> 
+            <div id="result"></div> 	
 
-            <!-- tokenlistener is any page that can extract NabToken from the post (PHP example: $_POST['NabToken']) -->
             <form action="velocityClients.php" method="POST" id="payment">
-	
-                <div>
-                    <label>Card holder name</label>
-                    <input id="card_holder_name" size="30" type="text" value="ashish" />
-                </div>
                 <div>
                     <label>Street</label>
-                    <input class="div-6" id="street" size="30" type="text" value="4 corporate sq" />
-                </div>
-                <div>
-                    <label>City</label>
-                    <input id="city" size="30" type="text" value="Denver" />
-                </div>
-                <div>
-                    <label>State</label>
-					<select id="state"/>
-                    <option value="CO">Colorado</option>
-                    <option value="NY">Newyork</option>
-                    </select>
+                    <input class="" id="street" size="30" type="text" value="4 CORPORATE SQ" />
                 </div>
                 <div>
                     <label>Zip</label>
-                    <input class="" id="zip" size="30" type="text" value="80202" />
+                    <input class="" id="zip" size="30" type="text" value="303292010" />
                 </div>
-                <div>
-                    <label>Country</label>
-                    <input id="country" size="30" type="text" value="USA" />
-                </div>
-                <div>
-                    <label>Email</label>
-                    <input class="div-6" id="email" size="30" type="text" value="ashishg2@chetu.com" />
-                </div>
-                <div>
-                    <label>Phone</label>
-                    <input class="div-6" id="phone" size="30" type="text" value="7849477899" />
-                </div>
-                <div>
+				<div>
                     <label>Card Type</label>
                     <select id="cardtype" />
-                    <option value="Visa">Visa</option>
-                    <option value="Master">Master</option>
+						<option value="Visa">Visa</option>
+						<option value="MasterCard">MasterCard</option>
+						<option value="AmericanExpress">AmericanExpress</option>
+						<option value="Discover">Discover</option>
                     </select>
                 </div>
                 <div>
                     <label>Credit Card Number: </label>
-                    <input id="cc-number" type="text" maxlength="16" autocomplete="off" value="4012888812348882" autofocus />
+                    <input id="pan" type="text" maxlength="16" autocomplete="off" value="4055010000000005" autofocus />
                 </div>
                 <div>
                     <label>CVC: </label>
-                    <input id="cc-cvc" type="text" maxlength="4" autocomplete="off" value="123"/>
+                    <input id="cvc" type="text" maxlength="4" autocomplete="off" value="123"/>
                 </div>
                 <div>
                     <label>Expiry Date: </label>
-                    <select id="cc-exp-month">
+                    <select id="exp-mo" value="12">
                         <option value="01">Jan</option>
                         <option value="02">Feb</option>
                         <option value="03">Mar</option>
@@ -142,7 +118,7 @@
                         <option value="11">Nov</option>
                         <option value="12">Dec</option>
                     </select>
-                    <select id="cc-exp-year">
+                    <select id="exp-year" value="15">
                         <option value="13">2013</option>
                         <option value="14">2014</option>
                         <option value="15">2015</option>
@@ -155,9 +131,9 @@
                         <option value="22">2022</option>
                     </select>
                 </div><br />
-                
                 <button id="process-payment-btn" type="submit">Process Payment</button>
-            </form>
+            </form>	
+		
         </div>
     </body>
 </html>

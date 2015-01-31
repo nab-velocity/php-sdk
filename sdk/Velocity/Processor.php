@@ -42,7 +42,7 @@ class Velocity_Processor
 	*/
 	
 	public function verify($options = array()) {
-		if(isset($options['carddata']) && isset($options['avsdata'])) {
+		//if(isset($options['token']) || isset($options['carddata'])) {
 		
 			try { 
 																	
@@ -68,9 +68,9 @@ class Velocity_Processor
 				throw new Exception( $e->getMessage() );
 			}
 	
-		} else {
-		    throw new Exception(Velocity_Message::$descriptions['errverftrandata']);
-		}
+		//} else {
+		//    throw new Exception(Velocity_Message::$descriptions['errverftrandata']);
+		//}
 		
 	}
 	
@@ -82,15 +82,15 @@ class Velocity_Processor
 	 */
 	public function authorizeAndCapture($options = array()) { 
 
-		if(isset($options['amount']) && ((isset($options['token']) || isset($options['carddata'])) || isset($options['avsdata']))) {
-			$amount = number_format($options['amount'], 2, '.', '');
-			$options['amount'] = $amount;
+		//if(isset($options['amount']) && (isset($options['token']) || isset($options['carddata']))) {
+			
+			//$options['amount'] = $amount;
 			try {
 			
 				$xml = Velocity_XmlCreator::authandcap_XML($options);  // got authorizeandcapture xml object. 
 				$xml->formatOutput = TRUE;
 				$body = $xml->saveXML();
-				//echo '<xmp>'.$body.'</xmp>';
+				//echo '<xmp>'.$body.'</xmp>'; die;
 				list($error, $response) = $this->connection->post(
 																	$this->path(
 																		self::$workflowid, 
@@ -105,14 +105,13 @@ class Velocity_Processor
 																 );
 				return $this->handleResponse($error, $response);
 				//return $response;
-				
 			} catch(Exception $e) {
 				throw new Exception($e->getMessage());
 			}
 		
-		} else {
-			throw new Exception(Velocity_Message::$descriptions['erraurhncapavswflid']);
-		}
+		//} else {
+		//	throw new Exception(Velocity_Message::$descriptions['erraurhncapavswflid']);
+		//}
 	}
 	
 	/*
@@ -124,14 +123,14 @@ class Velocity_Processor
 	*/
 	
 	public function authorize($options = array()) {
-		if(isset($options['amount']) && (isset($options['token']) || isset($options['carddata'])) && isset($options['avsdata'])) {
-		$amount = number_format($options['amount'], 2, '.', '');
-		$options['amount'] = $amount;
+		//if(isset($options['amount']) && (isset($options['token']) || isset($options['carddata']))) {
+		//$amount = number_format($options['amount'], 2, '.', '');
+		//$options['amount'] = $amount;
 			try {
 				$xml = Velocity_XmlCreator::auth_XML($options);  // got authorize xml object.
 				$xml->formatOutput = TRUE;
 				$body = $xml->saveXML();
-				//echo '<xmp>'.$body.'</xmp>';
+				//echo '<xmp>'.$body.'</xmp>'; die;
 				list($error, $response) = $this->connection->post(
 																	$this->path(
 																		self::$workflowid, 
@@ -150,9 +149,9 @@ class Velocity_Processor
 				throw new Exception( $e->getMessage() );
 			}
 	
-		} else {
-		    throw new Exception(Velocity_Message::$descriptions['errauthtrandata']);
-		}
+		 //} else {
+		 //    throw new Exception(Velocity_Message::$descriptions['errauthtrandata']);
+		 //}
 	}
 
 	/*
@@ -316,9 +315,9 @@ class Velocity_Processor
 	 */
 	public function returnUnlinked($options = array()) {
 		
-		if(isset($options['amount']) && (isset($options['token']) || isset($options['carddata']))) {
-			$amount = number_format($options['amount'], 2, '.', '');
-			$options['amount'] = $amount;
+		//if(isset($options['amount']) && (isset($options['token']) || isset($options['carddata']))) {
+			//$amount = number_format($options['amount'], 2, '.', '');
+			//$options['amount'] = $amount;
 			try {
 				$xml = Velocity_XmlCreator::returnunlinked_XML($options);  // got ReturnById xml object. 
 				$xml->formatOutput = TRUE;
@@ -342,9 +341,9 @@ class Velocity_Processor
 				throw new Exception($e->getMessage());
 			}
 			
-		} else {
-			throw new Exception(Velocity_Message::$descriptions['errreturntranidwid']);
-		}  
+		//} else {
+		//	throw new Exception(Velocity_Message::$descriptions['errreturntranidwid']);
+		//}  
 	}
 
 	
@@ -381,7 +380,13 @@ class Velocity_Processor
 			  return $this->processError($error, $response);
 		} else {
 		    if(!empty($response)) {
-			  return $response;
+				if ( isset($response['BankcardTransactionResponsePro']) ) {
+					return $response['BankcardTransactionResponsePro'];
+				} else if ( isset($response['BankcardCaptureResponse']) ) {
+					return $response['BankcardCaptureResponse'];
+				} else {
+					return $response;
+				}
 			}
 		}
 	}
@@ -393,7 +398,11 @@ class Velocity_Processor
 	* @return object $error detail created on the basis of gateway error status.
 	*/
 	public function processError($error, $response) {
-
+		if ( isset($response) )
+			return $response;
+		else
+			return $error;
+		
 		$reson = isset($response['ErrorResponse']['Reason']) ? $response['ErrorResponse']['Reason'] : 'ERR';
 		$validationErrors = isset($response['ErrorResponse']['ValidationErrors']) ? $response['ErrorResponse']['ValidationErrors'] : 'ERR';
 		$rulemsg = isset($response['ErrorResponse']['ValidationErrors']['ValidationError']['RuleMessage']) ? $response['ErrorResponse']['ValidationErrors']['ValidationError']['RuleMessage'] : '';
