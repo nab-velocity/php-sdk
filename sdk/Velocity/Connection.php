@@ -196,7 +196,7 @@ class Velocity_Connection
 		   preg_match('/Content-Type: ([^;]*);/i', $header, $match);
 		   $contentType = $match[1];
 		}
-
+		
 		// Parse response, depending on value of the Content-Type header.
 		$response = null;
 		if (preg_match('/json/', $contentType)) {
