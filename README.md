@@ -20,59 +20,47 @@ The Velocity PHP SDK has the following dependencies which are required.
 •	Create Velocity_Processer class object :
     
     try {
-      $velocity_processor = new Velocity_Processor( $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount,$identitytoken = null, $sessionToken );
+    $velocity_processor = new Velocity_Processor( $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount,$identitytoken = null, $sessionToken );
     } catch (Exception $e) {
 	 echo $e->getMessage();
     }
 
-
-
-
 Note: 
 •	$respone is an array/object for success/failure.
 •	Try, catch is mandatory for error handling.
+
 
 •	Verify method                
 
    
      try {
 	
-$response = $velocity_processor->verify( array(  'avsdata' => array(   'Street' => 'xyz', 
-												  'City' => 'cityname', 
-												  'StateProvince' => 'statecode', 
-												  'PostalCode' => 'postcode', 
-												  'Country' => 'countrycode three letter'
-												  ),
-												'carddata' => array(    'cardowner' => 'Jane Doe', 
-													 'cardtype' => 'Visa', 
-													 'pan' => '4012888812348882', 
-													 'expire' => '1215', 
-													 'cvv' => '123'
-												)
+		$response = $velocity_processor->verify( array(  								        	'avsdata' => array( 'Street' => 'xyz',                                                            'City' => 'cityname', 
+                                         'StateProvince' => 'statecode', 
+                                         'PostalCode' => 'postcode', 
+                                         'Country' => 'countrycode three letter'
+                                    ),
+				      'carddata' => array( 'cardowner' => 'Jane Doe', 
+                                           'cardtype' => 'Visa', 
+                                           'pan' => '4012888812348882', 
+                                           'expire' => '1215', 
+                                           'cvv' => '123'                                                                     )
 						)); 
-	 
-		
+
     } catch(Exception $e) {
 		echo $e->getMessage();
     }
-         
 
 •	Authorize and capture with token Method:                   
 
-try {
-        $response = $velocity_processor->authorizeAndCapture( array(
-					                                'amount' => 10.03, 
-						                            'avsdata' => array('Street' => 'xyz', 
-														'City' => 'cityname', 
-														'StateProvince' => 'statecode', 
-														'PostalCode' => 'postcode', 
-													  'Country' => 'countrycode three letter'
-													),
-												  'token' => $paymentAccountDataToken, 								      
-												  'order_id' => '629203',
+    try {	
+	       $response = $velocity_processor->authorizeAndCapture( array(
+	                     'amount' => 10.03, 
+		                 'avsdata' => array('Street' => 'xyz',                                                             'City' => 'cityname',                                                          'StateProvince' => 'statecode',                                                'PostalCode' => 'postcode', 
+                                            'Country' => 'countrycode three letter'                       ),
+						   'token' => $paymentAccountDataToken, 								          'order_id' => '629203',
 							)
 						);
-				
 		$authCapTransactionid = $response['TransactionId'];
 		
     } catch(Exception $e) {
@@ -84,24 +72,22 @@ For Authorize and capture without token Method:
            
        try {	
 	       $response = $velocity_processor->authorizeAndCapture( array(
-							          'amount' => 10.03, 
-						              'avsdata' => array( 'Street' => 'xyz', 
-												  'City' => 'cityname', 
-												  'StateProvince' => 'statecode', 
-												  'PostalCode' => 'postcode', 
-												  'Country' => 'countrycode three letter'
-												  ),
-, 					                  'carddata' => array(   'cardowner' => 'Jane Doe', 
-															 'cardtype' => 'Visa', 
-															 'pan' => '4012888812348882', 
-															 'expire' => '1215', 
-															 'cvv' => '123'
-															),
-							          'order_id' => '629203',
+							      'amount' => 10.03, 
+						          'avsdata' => array(   'Street' => 'xyz', 
+                                      'City' => 'cityname', 
+                                      'StateProvince' => 'statecode', 
+                                      'PostalCode' => 'postcode', 
+                                      'Country' => 'countrycode three letter'
+                                    ),
+                                 'carddata' => array( 'cardowner' => 'Jane Doe', 
+                                 'cardtype' => 'Visa', 
+                                 'pan' => '4012888812348882', 
+                                 'expire' => '1215', 
+                                 'cvv' => '123'
+                              ),
+							     'order_id' => '629203',
 							)
 						 );
-		
-		
 		$authCapTransactionid = $response['TransactionId'];
 		
     } catch(Exception $e) {
@@ -112,24 +98,26 @@ For Authorize and capture without token Method:
                
           try {
 	
-		$response = $velocity_processor->authorize( array(
-							   'amount' => 10,  
-							   'avsdata' => array(   'Street' => 'xyz', 
-									  'City' => 'cityname', 
-									  'StateProvince' => 'statecode', 
-									  'PostalCode' => 'postcode', 
-									  'Country' => 'countrycode three letter'
-								 ),
+	        	$response = $velocity_processor->authorize( array(
+								'amount' => 10,  
+                                'avsdata' => array(   'Street' => 'xyz', 
+                                'City' => 'cityname', 
+                                'StateProvince' => 'statecode', 
+                                'PostalCode' => 'postcode', 
+                                'Country' => 'countrycode three letter'
+                            ),
 								'token' => $paymentAccountDataToken,
 								'order_id' => '629203'
 								)
 							); 
- 		
 		$authTransactionid = $response['TransactionId'];
-		
 	} catch (Exception $e) {
 		echo $e->getMessage(); die;	
 	}        
+
+
+
+
 
 •	Authorize method without Token:    
                
@@ -138,18 +126,18 @@ For Authorize and capture without token Method:
 		$response = $velocity_processor->authorize( array(
 							      'amount' => 10,  
 						          'avsdata' => array( 'Street' => 'xyz', 
-												  'City' => 'cityname', 
-												  'StateProvince' => 'statecode', 
-												  'PostalCode' => 'postcode', 
-												  'Country' => 'countrycode three letter'
-												  ),
-, 					              'carddata' => array(   'cardowner' => 'Jane Doe', 
-														 'cardtype' => 'Visa', 
-														 'pan' => '4012888812348882', 
-														 'expire' => '1215', 
-														 'cvv' => '123'
-													),
-							      'order_id' => '629203'
+                                     'City' => 'cityname', 
+                                     'StateProvince' => 'statecode', 
+                                     'PostalCode' => 'postcode', 
+                                     'Country' => 'countrycode three letter'
+                                   ),
+                                 'carddata' => array( 'cardowner' => 'Jane Doe', 
+                                     'cardtype' => 'Visa', 
+                                     'pan' => '4012888812348882', 
+                                     'expire' => '1215', 
+                                      'cvv' => '123'
+                                    ),
+                                 'order_id' => '629203'
 							)
 						  ); 
  
@@ -158,8 +146,6 @@ For Authorize and capture without token Method:
 	} catch (Exception $e) {
 		echo $e->getMessage(); die;
 	}      
-
-
 
 
 •	Capture method:                   
