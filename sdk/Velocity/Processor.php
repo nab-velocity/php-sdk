@@ -10,7 +10,7 @@ class Velocity_Processor
 
 	private $isNew;
 	private $connection;
-	private $sessionToken = '';
+	public $sessionToken ;
 	public $messages = array();
 	public $errors = array();
 	public static $Txn_method = array('verify', 'authorize', 'authorizeandcapture', 'capture', 'adjust', 'undo', 'returnbyid', 'returnunlinked'); // array of method name to identify method request for common process
@@ -20,15 +20,19 @@ class Velocity_Processor
 	public static $workflowid;
 	public static $isTestAccount;
 
-	public function __construct($identitytoken, $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount) {
+	public function __construct($applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken = null, $sessiontoken = null ) {
 		$this->connection = Velocity_Connection::instance(); // velocity_connection class object store in private data member $connection. 
 		self::$identitytoken = $identitytoken;
 		self::$applicationprofileid = $applicationprofileid;
 		self::$merchantprofileid = $merchantprofileid;
 		self::$workflowid = $workflowid;
 		self::$isTestAccount = $isTestAccount;
-		$this->sessionToken = $this->connection->signOn();
-	
+		if(empty($sessiontoken) && !empty($identitytoken)){
+			$this->sessionToken = $this->connection->signOn();
+		} else {
+			$this->sessionToken = $sessiontoken; 
+		}
+		
 	}
 
 	/* -- Class Methods -- */
@@ -42,36 +46,31 @@ class Velocity_Processor
 	*/
 	
 	public function verify($options = array()) {
-		//if(isset($options['token']) || isset($options['carddata'])) {
 		
-			try { 
-																	
-				$xml = Velocity_XmlCreator::verify_XML($options);  // got Verify xml object.
-				$xml->formatOutput = TRUE;
-				$body = $xml->saveXML();
-				//echo '<xmp>'.$body.'</xmp>'; die;
-				list($error, $response) = $this->connection->post(
-																	$this->path(
-																		self::$workflowid, 
-																		self::$Txn_method[0], 
-																		self::$Txn_method[0]
-																	), 
-																	array(
-																		'sessiontoken' => $this->sessionToken, 
-																		'xml' => $body, 
-																		'method' => self::$Txn_method[0]
-																	)
-																 );
-				return $this->handleResponse($error, $response);
-				//return $response;
-			} catch (Exception $e) {
-				throw new Exception( $e->getMessage() );
-			}
+		try { 
+																
+			$xml = Velocity_XmlCreator::verify_XML($options);  // got Verify xml object.
+			$xml->formatOutput = TRUE;
+			$body = $xml->saveXML();
+			//echo '<xmp>'.$body.'</xmp>'; die;
+			list($error, $response) = $this->connection->post(
+																$this->path(
+																	self::$workflowid, 
+																	self::$Txn_method[0], 
+																	self::$Txn_method[0]
+																), 
+																array(
+																	'sessiontoken' => $this->sessionToken, 
+																	'xml' => $body, 
+																	'method' => self::$Txn_method[0]
+																)
+															 );
+			return $this->handleResponse($error, $response);
+			//return $response;
+		} catch (Exception $e) {
+			throw new Exception( $e->getMessage() );
+		}
 	
-		//} else {
-		//    throw new Exception(Velocity_Message::$descriptions['errverftrandata']);
-		//}
-		
 	}
 	
 	/*
@@ -82,36 +81,30 @@ class Velocity_Processor
 	 */
 	public function authorizeAndCapture($options = array()) { 
 
-		//if(isset($options['amount']) && (isset($options['token']) || isset($options['carddata']))) {
-			
-			//$options['amount'] = $amount;
-			try {
-			
-				$xml = Velocity_XmlCreator::authandcap_XML($options);  // got authorizeandcapture xml object. 
-				$xml->formatOutput = TRUE;
-				$body = $xml->saveXML();
-				//echo '<xmp>'.$body.'</xmp>'; die;
-				list($error, $response) = $this->connection->post(
-																	$this->path(
-																		self::$workflowid, 
-																		null, 
-																		self::$Txn_method[2]
-																	), 
-																	array(
-																		'sessiontoken' => $this->sessionToken, 
-																		'xml' => $body, 
-																		'method' => self::$Txn_method[2]
-																		)
-																 );
-				return $this->handleResponse($error, $response);
-				//return $response;
-			} catch(Exception $e) {
-				throw new Exception($e->getMessage());
-			}
+		try {
 		
-		//} else {
-		//	throw new Exception(Velocity_Message::$descriptions['erraurhncapavswflid']);
-		//}
+			$xml = Velocity_XmlCreator::authandcap_XML($options);  // got authorizeandcapture xml object. 
+			$xml->formatOutput = TRUE;
+			$body = $xml->saveXML();
+			//echo '<xmp>'.$body.'</xmp>'; die;
+			list($error, $response) = $this->connection->post(
+																$this->path(
+																	self::$workflowid, 
+																	null, 
+																	self::$Txn_method[2]
+																), 
+																array(
+																	'sessiontoken' => $this->sessionToken, 
+																	'xml' => $body, 
+																	'method' => self::$Txn_method[2]
+																	)
+															 );
+			return $this->handleResponse($error, $response);
+			//return $response;
+		} catch(Exception $e) {
+			throw new Exception($e->getMessage());
+		}
+		
 	}
 	
 	/*
@@ -123,35 +116,30 @@ class Velocity_Processor
 	*/
 	
 	public function authorize($options = array()) {
-		//if(isset($options['amount']) && (isset($options['token']) || isset($options['carddata']))) {
-		//$amount = number_format($options['amount'], 2, '.', '');
-		//$options['amount'] = $amount;
-			try {
-				$xml = Velocity_XmlCreator::auth_XML($options);  // got authorize xml object.
-				$xml->formatOutput = TRUE;
-				$body = $xml->saveXML();
-				//echo '<xmp>'.$body.'</xmp>'; die;
-				list($error, $response) = $this->connection->post(
-																	$this->path(
-																		self::$workflowid, 
-																		null, 
-																		self::$Txn_method[1]
-																	), 
-																	array(
-																		'sessiontoken' => $this->sessionToken, 
-																		'xml' => $body, 
-																		'method' => self::$Txn_method[1]
-																	)
-																 );
-				return $this->handleResponse($error, $response);
-				//return $response;
-			} catch (Exception $e) {
-				throw new Exception( $e->getMessage() );
-			}
-	
-		 //} else {
-		 //    throw new Exception(Velocity_Message::$descriptions['errauthtrandata']);
-		 //}
+
+		try {
+			$xml = Velocity_XmlCreator::auth_XML($options);  // got authorize xml object.
+			$xml->formatOutput = TRUE;
+			$body = $xml->saveXML();
+			//echo '<xmp>'.$body.'</xmp>'; die;
+			list($error, $response) = $this->connection->post(
+																$this->path(
+																	self::$workflowid, 
+																	null, 
+																	self::$Txn_method[1]
+																), 
+																array(
+																	'sessiontoken' => $this->sessionToken, 
+																	'xml' => $body, 
+																	'method' => self::$Txn_method[1]
+																)
+															 );
+			return $this->handleResponse($error, $response);
+			//return $response;
+		} catch (Exception $e) {
+			throw new Exception( $e->getMessage() );
+		}
+
 	}
 
 	/*
@@ -315,35 +303,29 @@ class Velocity_Processor
 	 */
 	public function returnUnlinked($options = array()) {
 		
-		//if(isset($options['amount']) && (isset($options['token']) || isset($options['carddata']))) {
-			//$amount = number_format($options['amount'], 2, '.', '');
-			//$options['amount'] = $amount;
-			try {
-				$xml = Velocity_XmlCreator::returnunlinked_XML($options);  // got ReturnById xml object. 
-				$xml->formatOutput = TRUE;
-				$body = $xml->saveXML();
-				//echo '<xmp>'.$body.'</xmp>'; die;
-				list($error, $response) = $this->connection->post(
-																	$this->path(
-																		self::$workflowid, 
-																		null, 
-																		self::$Txn_method[7]
-																	), 
-																	array(
-																		'sessiontoken' =>  $this->sessionToken, 
-																		'xml' => $body, 
-																		'method' => self::$Txn_method[7]
-																	)
-																 );
-				return $this->handleResponse($error, $response);
-				//return $response;
-			} catch (Exception $e) {
-				throw new Exception($e->getMessage());
-			}
-			
-		//} else {
-		//	throw new Exception(Velocity_Message::$descriptions['errreturntranidwid']);
-		//}  
+		try {
+			$xml = Velocity_XmlCreator::returnunlinked_XML($options);  // got ReturnById xml object. 
+			$xml->formatOutput = TRUE;
+			$body = $xml->saveXML();
+			//echo '<xmp>'.$body.'</xmp>'; die;
+			list($error, $response) = $this->connection->post(
+																$this->path(
+																	self::$workflowid, 
+																	null, 
+																	self::$Txn_method[7]
+																), 
+																array(
+																	'sessiontoken' =>  $this->sessionToken, 
+																	'xml' => $body, 
+																	'method' => self::$Txn_method[7]
+																)
+															 );
+			return $this->handleResponse($error, $response);
+			//return $response;
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
+		}
+		  
 	}
 
 	

@@ -28,7 +28,7 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	$isTestAccount = true;
 
 	try {
-		$velocity_processor = new Velocity_Processor( $identitytoken, $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount );
+		$velocity_processor = new Velocity_Processor( $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount,$identitytoken = null, $sessionToken );
 	} catch (Exception $e) {
 	    echo $e->getMessage();
 	}
