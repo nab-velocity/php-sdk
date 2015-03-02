@@ -28,7 +28,7 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	$isTestAccount = true;
 
 	try {
-		$velocity_processor = new Velocity_Processor( $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount,$identitytoken = null, $sessionToken );
+		$velocity_processor = new Velocity_Processor( $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken );
 	} catch (Exception $e) {
 	    echo $e->getMessage();
 	}
@@ -49,10 +49,14 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 													'carddata' => $cardData,
 													)); 
  
-		if ($response['Status'] == 'Successful') {
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'Verify Successful!</br>';
-			echo 'PostalCodeResult: ' . $response['AVSResult']['PostalCodeResult'] . '</br></br>'; 
-		} 
+			echo 'PostalCodeResult: ' . $response['AVSResult']['PostalCodeResult'] . '</br>'; 
+			echo 'CVResult: ' . $response['CVResult'] . '</br></br>'; 
+		} else {
+			// some error
+			print_r($response);
+		}
 		
     } catch(Exception $e) {
 		echo $e->getMessage();
@@ -70,12 +74,15 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 																		)
 																    );
 		
-		if ($response['Status'] == 'Successful') {
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'AuthorizeAndCapture Successful!</br>';
 			echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
 			echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
 			echo 'Amount: ' . $response['Amount'] . '</br>'; 
 			echo 'TransactionId: ' . $response['TransactionId'] . '</br></br>'; 
+		} else {
+			// some error
+			print_r($response);
 		}
 		
 		$authCapTransactionid = $response['TransactionId'];
@@ -95,12 +102,15 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 														)
 												); 
  
-		if ($response['Status'] == 'Successful') {
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'Authorize Successful!</br>';
 			echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
 			echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
 			echo 'Amount: ' . $response['Amount'] . '</br>'; 
 			echo 'TransactionId: ' . $response['TransactionId'] . '</br></br>'; 
+		} else {
+			// some error
+			print_r($response);
 		}
 		
 		$authTransactionid = $response['TransactionId'];
@@ -122,9 +132,12 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 												);
 		
 		//print_r($response);
-		if ($response['Status'] == 'Successful') {
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'Capture Successful!</br>';
 			echo 'Amount: ' . $response['TransactionSummaryData']['NetTotals']['NetAmount'] . '</br></br>'; 
+		} else {
+			// some error
+			print_r($response);
 		}
 		
 		$captxnid = $response['TransactionId'];
@@ -143,9 +156,12 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 													)
 												);
 		 
-		if ($response['Status'] == 'Successful') {
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'Adjust Successful!</br>';
 			echo 'Amount: ' . $response['Amount'] . '</br></br>'; 
+		} else {
+			// some error
+			print_r($response);
 		}
 		
 	} catch (Exception $e) {
@@ -162,9 +178,12 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 												   ) 
 										   );
 										   
-		if ($response['Status'] == 'Successful') {
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'Undo Successful!</br>';
 			echo 'TransactionId: ' . $response['TransactionId'] . '</br></br>'; 
+		} else {
+			// some error
+			print_r($response);
 		}
 		
 	} catch (Exception $e) {
@@ -181,9 +200,12 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 												  );
 		
 		
-		if ($response['Status'] == 'Successful') {
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'ReturnById Successful!</br>';
 			echo 'ApprovalCode: ' . $response['ApprovalCode'] . '</br></br>'; 
+		} else {
+			// some error
+			print_r($response);
 		}
 		
     } catch (Exception $e) {
@@ -202,9 +224,12 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 														);
 		
 		 
-		if ($response['Status'] == 'Successful') {
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'ReturnUnlinked Successful!</br>';
 			echo 'ApprovalCode: ' . $response['ApprovalCode'] . '</br></br>'; 
+		} else {
+			// some error
+			print_r($response);
 		}
 		
     } catch (Exception $e) {
