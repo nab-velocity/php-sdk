@@ -1,110 +1,40 @@
+# Velocity PHP SDK Documentation 
 
-Velocity PHP SDK Documentations 
+## Installation
 
+[Download ZIP](https://github.com/nab-velocity/php-client-sdk/archive/readme_changes.zip) and unzip to a web server.  The SDK alone can be found in the actual SDK folder.  The index.php file is an example payments form utilizing Velocity's transparent redirect.  The transparent redirect does a Verify (zero-dollar authorization) in order to tokenize the cardholder data.  This reduces the PCI-scope of the payments form by sending the payment data directly from the client's browser (via javascript) to the Velocity server.  It then redirects the payment form to the velocityClients.php page which utilizes the card data token to perform further payment operations exposed by the SDK.  
 
+## Dependencies
 
-1.	Installation: Download and unzip.
+Credentials for the velocity platform are required for configuration (IdentityToken, WorkflowId, ApplicationProfileId, & MerchantProfileId).  You should obtain these from your solutions consultant.
 
- 
+##	Tutorial
 
-Dependencies:
+#### 1. Include PHP sdk
 
-Velocity credentials are required for configuration (identitytoken, workflowid, applicationprofileid, merchantprofileid ).
+```
+require_once 'Velocity.php';
+```
 
-2.	How to use the PHP SDK
+#### 2. Instantiate processor
 
-Include PHP sdk:
-
-	require_once 'Velocity.php';
-
-Create Velocity_Processer class object :
-
+```
 try {
-	$velocity_processor = new Velocity_Processor( $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken );
+	$velocity_processor = new Velocity_Processor($applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken);
 } catch (Exception $e) {
 	echo $e->getMessage();
 }
+```
 
+Here we instantiate the processor in order to use it to process payments.  It takes all of our configuration paramerters as well as a boolean indicating whether we are testing or not.  Test accounts go through Velocity's certification environment, while non-test accounts imply a live card-holder data environment.
 
+#### 3. Use payment methods of processor 
 
+To understand the Authorization & Capture process, please read our [Integration Guidance](http://docs.nabvelocity.com/hc/en-us/articles/202966458-Integration-Guidance-Transaction-Processing).  Also, the [tokenization process](http://docs.nabvelocity.com/hc/en-us/articles/202551793-Value-Added-Service-Provider-Guidelines-Tokenization) should be understood.  For each payment method taking cardholder data below (Authorize, AuthorizeAndCapture, ReturnUnlinked) an example is given both with and without token.  Tokens are obtained from a solution like the Tranpsarent Redirect, or by a direct call to Verify via the SDK.  Utilizing tokens can help reduce your PCI scope.
 
-Note: 
-$response is an array/object for success/failure.
-Try, catch is mandatory for error handling.
+#### Authorize and capture with token              
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Verify method                
-
-   
-try {
-	
-	$response = $velocity_processor->verify(array(  									
-		'avsdata' => array(   
-			'Street' => 'xyz', 
-			'City' => 'cityname', 
-			'StateProvince' => 'statecode', 
-			'PostalCode' => 'postcode', 
-			'Country' => 'countrycode three letter'
-		),
-		'carddata' => array(    
-			'cardowner' => 'Jane Doe', 
-			'cardtype' => 'Visa', 
-			'pan' => '4012888812348882', 
-			'expire' => '1215', 
-			'cvv' => '123'
-		)										
-	)); 
-
-	if (isset($response['Status']) && $response['Status'] == 'Successful') {
-		echo 'Verify Successful!</br>';
-		echo 'PostalCodeResult: ' . $response['AVSResult']['PostalCodeResult'] . '</br>'; 
-		echo 'CVResult: ' . $response['CVResult']; 
-	} else {
-		// some error
-		print_r($response);
-	}
-
-} catch(Exception $e) {
-	echo $e->getMessage();
-}
-         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Authorize and capture with token Method              
-
+```
 try {
 	
 	$response = $velocity_processor->authorizeAndCapture(array(
@@ -136,10 +66,11 @@ try {
 } catch(Exception $e) {
 	echo $e->getMessage(); 
 } 
+```
 
-Note: $paymentAccountDataToken is obtained from a previous transaction’s response (usually verify) and represents a credit card.. 
-For Authorize and capture without token Method:   
-           
+#### Authorize and capture without token 
+
+```          
 try {	
 
 	$response = $velocity_processor->authorizeAndCapture(array(
@@ -177,24 +108,11 @@ try {
 } catch(Exception $e) {
 	echo $e->getMessage(); 
 }
+```
 
+#### Authorize method with token 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Authorize method with Token:    
-               
+```            
 try {
 	
 	$response = $velocity_processor->authorize(array(
@@ -226,31 +144,11 @@ try {
 } catch (Exception $e) {
 	echo $e->getMessage();	
 }        
+```
 
+#### Authorize method without token  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Authorize method without Token:    
-               
+```
 try {
 	
 	$response = $velocity_processor->authorize(array(
@@ -288,20 +186,11 @@ try {
 } catch (Exception $e) {
 	echo $e->getMessage();
 }      
+```
 
+#### Capture                
 
-
-
-
-
-
-
-
-
-
-
-Capture method:                   
-
+```
 try {
 	
 	$response = $velocity_processor->capture(array(
@@ -322,16 +211,11 @@ try {
 } catch(Exception $e) {
 	echo $e->getMessage();
 }
+```
 
+#### Undo (Void/Reversal)                   
 
-Note : $authTransactionid is obtained from authorize response.
-
-
-
-
-
-Void(Undo) method:                   
-
+```
 try {
 	
 	$response = $velocity_processor->undo(array(
@@ -349,12 +233,11 @@ try {
 } catch (Exception $e) {
 	echo $e->getMessage();
 } 
+```
 
+#### Adjust        
 
-
-
-Adjust method:            
-       
+```     
 try {
 		
 	$response = $velocity_processor->adjust(array(
@@ -373,17 +256,13 @@ try {
 } catch (Exception $e) {
 	echo $e->getMessage();
 }
-	
-	
+```	
 
+#### ReturnById            
 
-
-
-
-ReturnById method:             
-      
+```
 try {
-	$response = $velocity_processor->returnById( array(
+	$response = $velocity_processor->returnById(array(
 		'amount' => 5.03, 
 		'TransactionId' => $authCapTransactionid
 	));
@@ -399,9 +278,11 @@ try {
 } catch (Exception $e) {
 	echo $e->getMessage();
 }
+```
 
-ReturnUnlinked method with token: 
-               
+#### ReturnUnlinked with token: 
+
+```             
 try {
 				
 	$response = $velocity_processor->returnUnlinked(array( 
@@ -421,9 +302,11 @@ try {
 } catch (Exception $e) {
 	echo $e->getMessage();
 }
+```
  
-ReturnUnlinked method without token: 
-               
+#### ReturnUnlinked without token
+
+```           
 try {
 				
 	$response = $velocity_processor->returnUnlinked(array( 
@@ -449,3 +332,40 @@ try {
 } catch (Exception $e) {
 	echo $e->getMessage();
 }
+```
+
+#### Verify method            
+
+```   
+try {
+	
+	$response = $velocity_processor->verify(array(  									
+		'avsdata' => array(   
+			'Street' => 'xyz', 
+			'City' => 'cityname', 
+			'StateProvince' => 'statecode', 
+			'PostalCode' => 'postcode', 
+			'Country' => 'countrycode three letter'
+		),
+		'carddata' => array(    
+			'cardowner' => 'Jane Doe', 
+			'cardtype' => 'Visa', 
+			'pan' => '4012888812348882', 
+			'expire' => '1215', 
+			'cvv' => '123'
+		)										
+	)); 
+
+	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+		echo 'Verify Successful!</br>';
+		echo 'PostalCodeResult: ' . $response['AVSResult']['PostalCodeResult'] . '</br>'; 
+		echo 'CVResult: ' . $response['CVResult']; 
+	} else {
+		// some error
+		print_r($response);
+	}
+
+} catch(Exception $e) {
+	echo $e->getMessage();
+}
+```   
