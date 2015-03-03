@@ -44,10 +44,10 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	
 	try {
 	
-		$response = $velocity_processor->verify( array(  
-													'avsdata' => $avsData, 
-													'carddata' => $cardData,
-													)); 
+		$response = $velocity_processor->verify(array(  
+			'avsdata' => $avsData, 
+			'carddata' => $cardData,
+		)); 
  
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'Verify Successful!</br>';
@@ -58,7 +58,7 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 			print_r($response);
 		}
 		
-    } catch(Exception $e) {
+    	} catch(Exception $e) {
 		echo $e->getMessage();
 	}
 	
@@ -66,13 +66,12 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	
 	try {
 			
-		$response = $velocity_processor->authorizeAndCapture( array(
-																		'amount' => 10.03, 
-																		'avsdata' => $avsData,
-																		'token' => $paymentAccountDataToken, 
-																		'order_id' => '629203',
-																		)
-																    );
+		$response = $velocity_processor->authorizeAndCapture(array(
+			'amount' => 10.03, 
+			'avsdata' => $avsData,
+			'token' => $paymentAccountDataToken, 
+			'order_id' => '629203',
+		));
 		
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'AuthorizeAndCapture Successful!</br>';
@@ -87,7 +86,7 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 		
 		$authCapTransactionid = $response['TransactionId'];
 		
-    } catch(Exception $e) {
+    	} catch(Exception $e) {
 		echo $e->getMessage(); 
 	}
 	
@@ -95,12 +94,11 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	
 	try {
 	
-		$response = $velocity_processor->authorize( array(
-														'amount' => 10,  
-														'carddata' => $cardData,
-														'order_id' => '629203'
-														)
-												); 
+		$response = $velocity_processor->authorize(array(
+			'amount' => 10,  
+			'carddata' => $cardData,
+			'order_id' => '629203'
+		)); 
  
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'Authorize Successful!</br>';
@@ -116,20 +114,17 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 		$authTransactionid = $response['TransactionId'];
 		
 	} catch (Exception $e) {
-	
-		echo $e->getMessage(); die;
-		
+		echo $e->getMessage();
 	} 
 	
 	/* *****************************************************Capture******************************************************************************** */
 	
 	try {
 	
-		$response = $velocity_processor->capture( array(
-														'amount' => 6.03, 
-														'TransactionId' => $authTransactionid
-														)
-												);
+		$response = $velocity_processor->capture(array(
+			'amount' => 6.03, 
+			'TransactionId' => $authTransactionid
+		));
 		
 		//print_r($response);
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
@@ -150,11 +145,10 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 		
 	try {
 		
-		$response = $velocity_processor->adjust( array(
-													'amount' => 3.01, 
-													'TransactionId' => $captxnid
-													)
-												);
+		$response = $velocity_processor->adjust(array(
+			'amount' => 3.01, 
+			'TransactionId' => $captxnid
+		));
 		 
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'Adjust Successful!</br>';
@@ -173,10 +167,9 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	/* *****************************************************Undo******************************************************************************** */
 	
 	try {
-		$response = $velocity_processor->undo( array(
-												  'TransactionId' => $adjusttxnid
-												   ) 
-										   );
+		$response = $velocity_processor->undo(array(
+			'TransactionId' => $adjusttxnid
+		));
 										   
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'Undo Successful!</br>';
@@ -193,12 +186,11 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	/* *****************************************************ReturnById************************************************************************* */
 	
 	try {
-		$response = $velocity_processor->returnById( array(
-														  'amount' => 5.03, 
-														  'TransactionId' => $authCapTransactionid
-														  ) 
-												  );
 		
+		$response = $velocity_processor->returnById(array(
+			'amount' => 5.03, 
+			'TransactionId' => $authCapTransactionid
+		));
 		
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'ReturnById Successful!</br>';
@@ -208,7 +200,7 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 			print_r($response);
 		}
 		
-    } catch (Exception $e) {
+    	} catch (Exception $e) {
 		echo $e->getMessage();
 	} 
 	
@@ -216,12 +208,11 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	
 	try {
 				
-		$response = $velocity_processor->returnUnlinked( array( 
-															  'amount' => 1.03, 
-															  'token' => $paymentAccountDataToken, 
-															  'order_id' => '629203'
-															   ) 
-														);
+		$response = $velocity_processor->returnUnlinked(array( 
+			'amount' => 1.03, 
+			'token' => $paymentAccountDataToken, 
+			'order_id' => '629203'
+		));
 		
 		 
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
@@ -232,7 +223,7 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 			print_r($response);
 		}
 		
-    } catch (Exception $e) {
+    	} catch (Exception $e) {
 		echo $e->getMessage();
 	}
 	
