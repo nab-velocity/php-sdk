@@ -6,7 +6,7 @@ class Velocity_Message
   }
 
   public static $descriptions = array(
-    'errtransparentjs' => 'Post data is not set from transparent redirect.',
+        'errtransparentjs' => 'Due to some technical issue, payment detail not recived by payment gateways',
 	'errsessionxmlnotset' => 'Before curl request session and/or xml not set!',
 	'errcredentialnotset' => 'Error one or credential not like applicationid, merchantprofileid etc.',
 	'errpostmethod' => 'Error in path and/or data array in post method.',

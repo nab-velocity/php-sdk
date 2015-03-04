@@ -54,17 +54,17 @@ class Velocity_Processor
 			$body = $xml->saveXML();
 			//echo '<xmp>'.$body.'</xmp>'; die;
 			list($error, $response) = $this->connection->post(
-																$this->path(
-																	self::$workflowid, 
-																	self::$Txn_method[0], 
-																	self::$Txn_method[0]
-																), 
-																array(
-																	'sessiontoken' => $this->sessionToken, 
-																	'xml' => $body, 
-																	'method' => self::$Txn_method[0]
-																)
-															 );
+                                                                            $this->path(
+                                                                                    self::$workflowid, 
+                                                                                    self::$Txn_method[0], 
+                                                                                    self::$Txn_method[0]
+                                                                            ), 
+                                                                            array(
+                                                                                    'sessiontoken' => $this->sessionToken, 
+                                                                                    'xml' => $body, 
+                                                                                    'method' => self::$Txn_method[0]
+                                                                            )
+                                                                     );
 			return $this->handleResponse($error, $response);
 			//return $response;
 		} catch (Exception $e) {
@@ -88,17 +88,17 @@ class Velocity_Processor
 			$body = $xml->saveXML();
 			//echo '<xmp>'.$body.'</xmp>'; die;
 			list($error, $response) = $this->connection->post(
-																$this->path(
-																	self::$workflowid, 
-																	null, 
-																	self::$Txn_method[2]
-																), 
-																array(
-																	'sessiontoken' => $this->sessionToken, 
-																	'xml' => $body, 
-																	'method' => self::$Txn_method[2]
-																	)
-															 );
+                                                                            $this->path(
+                                                                                    self::$workflowid, 
+                                                                                    null, 
+                                                                                    self::$Txn_method[2]
+                                                                            ), 
+                                                                            array(
+                                                                                    'sessiontoken' => $this->sessionToken, 
+                                                                                    'xml' => $body, 
+                                                                                    'method' => self::$Txn_method[2]
+                                                                                    )
+                                                                     );
 			return $this->handleResponse($error, $response);
 			//return $response;
 		} catch(Exception $e) {
@@ -123,17 +123,17 @@ class Velocity_Processor
 			$body = $xml->saveXML();
 			//echo '<xmp>'.$body.'</xmp>'; die;
 			list($error, $response) = $this->connection->post(
-																$this->path(
-																	self::$workflowid, 
-																	null, 
-																	self::$Txn_method[1]
-																), 
-																array(
-																	'sessiontoken' => $this->sessionToken, 
-																	'xml' => $body, 
-																	'method' => self::$Txn_method[1]
-																)
-															 );
+                                                                            $this->path(
+                                                                                    self::$workflowid, 
+                                                                                    null, 
+                                                                                    self::$Txn_method[1]
+                                                                            ), 
+                                                                            array(
+                                                                                    'sessiontoken' => $this->sessionToken, 
+                                                                                    'xml' => $body, 
+                                                                                    'method' => self::$Txn_method[1]
+                                                                            )
+                                                                     );
 			return $this->handleResponse($error, $response);
 			//return $response;
 		} catch (Exception $e) {
@@ -158,17 +158,17 @@ class Velocity_Processor
 				$body = $xml->saveXML();
 				//echo '<xmp>'.$body.'</xmp>'; die;
 				list($error, $response) = $this->connection->put(
-																	$this->path(
-																					self::$workflowid, 
-																					$options['TransactionId'], 
-																					self::$Txn_method[3]
-																				), 
-																	 array(
-																			'sessiontoken' => $this->sessionToken, 
-																			'xml' => $body, 
-																			'method' => self::$Txn_method[3]
-																		  )
-																);
+                                                                                $this->path(
+                                                                                                                self::$workflowid, 
+                                                                                                                $options['TransactionId'], 
+                                                                                                                self::$Txn_method[3]
+                                                                                                        ), 
+                                                                                 array(
+                                                                                                'sessiontoken' => $this->sessionToken, 
+                                                                                                'xml' => $body, 
+                                                                                                'method' => self::$Txn_method[3]
+                                                                                          )
+                                                                        );
 				//return $response;
 				return $this->handleResponse($error, $response);
 			} catch(Exception $e) {
@@ -196,17 +196,17 @@ class Velocity_Processor
 				$body = $xml->saveXML();
 				//echo '<xmp>'.$body.'</xmp>'; die;
 				list($error, $response) = $this->connection->put(
-																	$this->path(
-																		self::$workflowid, 
-																		$options['TransactionId'], 
-																		self::$Txn_method[4]
-																	), 
-																	array(
-																		'sessiontoken' => $this->sessionToken, 
-																		'xml' => $body, 
-																		'method' => self::$Txn_method[4]
-																	)
-																);
+                                                                                $this->path(
+                                                                                        self::$workflowid, 
+                                                                                        $options['TransactionId'], 
+                                                                                        self::$Txn_method[4]
+                                                                                ), 
+                                                                                array(
+                                                                                        'sessiontoken' => $this->sessionToken, 
+                                                                                        'xml' => $body, 
+                                                                                        'method' => self::$Txn_method[4]
+                                                                                )
+                                                                        );
 				return $this->handleResponse($error, $response);
 		        //return $response;
 			} catch (Exception $e) {
@@ -233,17 +233,17 @@ class Velocity_Processor
 				$xml->formatOutput = TRUE;
 				$body = $xml->saveXML();
 				list($error, $response) = $this->connection->put( 
-																	$this->path(
-																		self::$workflowid, 
-																		$options['TransactionId'], 
-																		self::$Txn_method[5]
-																	), 
-																	array(
-																		'sessiontoken' => $this->sessionToken, 
-																		'xml' => $body, 
-																		'method' => self::$Txn_method[5]
-																	) 
-																);
+                                                                                $this->path(
+                                                                                        self::$workflowid, 
+                                                                                        $options['TransactionId'], 
+                                                                                        self::$Txn_method[5]
+                                                                                ), 
+                                                                                array(
+                                                                                        'sessiontoken' => $this->sessionToken, 
+                                                                                        'xml' => $body, 
+                                                                                        'method' => self::$Txn_method[5]
+                                                                                ) 
+                                                                        );
 				//return $response;
 				return $this->handleResponse($error, $response);
 			} catch (Exception $e) {
@@ -257,7 +257,7 @@ class Velocity_Processor
 	
 	
 	/*
-	 * The ReturnById operation is used to perform a linked credit to a cardholder’s account from the merchant’s account based on a
+	 * The ReturnById operation is used to perform a linked credit to a cardholderï¿½s account from the merchantï¿½s account based on a
 	 * previously authorized and settled transaction.
 	 * @param array $options this is hold the transactionid, method name.
 	 * @return array $this->handleResponse($error, $response) array of successfull or failure of gateway response. 
@@ -272,17 +272,17 @@ class Velocity_Processor
 				$body = $xml->saveXML();
 				//echo '<xmp>'.$body.'</xmp>'; die;
 				list($error, $response) = $this->connection->post(
-																	$this->path(
-																		self::$workflowid, 
-																		null, 
-																		self::$Txn_method[6]
-																	), 
-																	array(
-																		'sessiontoken' => $this->sessionToken, 
-																		'xml' => $body, 
-																		'method' => self::$Txn_method[6]
-																	)
-																 );
+                                                                                    $this->path(
+                                                                                            self::$workflowid, 
+                                                                                            null, 
+                                                                                            self::$Txn_method[6]
+                                                                                    ), 
+                                                                                    array(
+                                                                                            'sessiontoken' => $this->sessionToken, 
+                                                                                            'xml' => $body, 
+                                                                                            'method' => self::$Txn_method[6]
+                                                                                    )
+                                                                             );
 				return $this->handleResponse($error, $response);
 				//return $response;
 			} catch (Exception $e) {
@@ -296,7 +296,7 @@ class Velocity_Processor
 
 	
 	/*
-	 * The ReturnUnlinked operation is used to perform an "unlinked", or standalone, credit to a cardholder’s account from the merchant’s account.
+	 * The ReturnUnlinked operation is used to perform an "unlinked", or standalone, credit to a cardholderï¿½s account from the merchantï¿½s account.
 	 * This operation is useful when a return transaction is not associated with a previously authorized and settled transaction.
 	 * @param array $options this array hold "amount, paymentAccountDataToken, avsData, carddata, invoice no., order no"
 	 * @return array $this->handleResponse($error, $response) array of successfull or failure of gateway response. 
@@ -309,17 +309,17 @@ class Velocity_Processor
 			$body = $xml->saveXML();
 			//echo '<xmp>'.$body.'</xmp>'; die;
 			list($error, $response) = $this->connection->post(
-																$this->path(
-																	self::$workflowid, 
-																	null, 
-																	self::$Txn_method[7]
-																), 
-																array(
-																	'sessiontoken' =>  $this->sessionToken, 
-																	'xml' => $body, 
-																	'method' => self::$Txn_method[7]
-																)
-															 );
+                                                                            $this->path(
+                                                                                    self::$workflowid, 
+                                                                                    null, 
+                                                                                    self::$Txn_method[7]
+                                                                            ), 
+                                                                            array(
+                                                                                    'sessiontoken' =>  $this->sessionToken, 
+                                                                                    'xml' => $body, 
+                                                                                    'method' => self::$Txn_method[7]
+                                                                            )
+                                                                     );
 			return $this->handleResponse($error, $response);
 			//return $response;
 		} catch (Exception $e) {

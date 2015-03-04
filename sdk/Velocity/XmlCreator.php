@@ -474,13 +474,13 @@ class Velocity_XmlCreator {
 	public static function returnunlinked_XML($data){
 		$xml = new DOMDocument("1.0");
 
-		$root = $xml->createElement("AuthorizeAndCaptureTransaction");
+		$root = $xml->createElement("ReturnTransaction");
 
 		$xml->appendChild($root);
 
 		$root->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:i', 'http://www.w3.org/2001/XMLSchema-instance');
 		$root->setAttribute('xmlns', 'http://schemas.ipcommerce.com/CWS/v2.0/Transactions/Rest');
-		$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'AuthorizeAndCaptureTransaction');
+		$root->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'ReturnTransaction');
 
 		return Velocity_XmlCreator::transaction_XML($xml, $root, $data);
 	}
