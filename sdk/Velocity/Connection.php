@@ -29,7 +29,7 @@ class Velocity_Connection
 		if (isset($path) && isset($data)) {	
 			return $this->request('GET', $path, $data);
 		} else {	
-			throw new Exception($data['method'].':'.Velocity_Message::$descriptions['errgetmethod']);
+			throw new Exception(Velocity_Message::$descriptions['errgetmethod']);
 		}
 	}
 
@@ -44,7 +44,7 @@ class Velocity_Connection
 		if (isset($path) && isset($data)) {
 			return $this->request('POST', $path, $data);
 		} else {
-			throw new Exception($data['method'].':'.Velocity_Message::$descriptions['errpostmethod']);
+			throw new Exception(Velocity_Message::$descriptions['errpostmethod']);
 		}
 	}
 
@@ -59,7 +59,7 @@ class Velocity_Connection
 		if (isset($path) && isset($data)) { 
 			return $this->request('PUT', $path, $data);
 		} else {
-			throw new Exception($data['method'].':'.Velocity_Message::$descriptions['errputmethod']);
+			throw new Exception(Velocity_Message::$descriptions['errputmethod']);
 		}
 	}
 
