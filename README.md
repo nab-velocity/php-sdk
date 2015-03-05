@@ -13,7 +13,7 @@ Credentials for the velocity platform are required for configuration (IdentityTo
 #### 1. Include PHP sdk
 
 ```
-require_once 'Velocity.php';
+require_once '/sdk/Velocity.php';
 ```
 
 #### 2. Instantiate processor
