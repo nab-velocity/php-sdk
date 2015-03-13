@@ -141,7 +141,7 @@ class Velocity_XmlCreator {
 			Velocity_XmlCreator::populate_XML_element_if_array_value_isset('track2data', "bcp:Track2Data", $xml, $n2, $data['carddata']);		
 		}
 
-		if (isset($data['avsdata']) || (isset($data['carddata']) && isset($data['cvdata']['cvv']))){
+		if (isset($data['avsdata']) || (isset($data['carddata']) && isset($data['carddata']['cvv']))){
 			$n2 = $xml->createElement("bcp:CardSecurityData");
 			$n1->appendChild($n2);
 
