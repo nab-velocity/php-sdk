@@ -1,6 +1,6 @@
 <?php
 
-class Velocity_Message
+class VelocityMessage
 {
   public function __construct(){
   }
@@ -13,7 +13,7 @@ class Velocity_Message
 	'errgetmethod' => 'Requested url of gateway is not valid.',
 	'errputmethod' => 'Requested url of gateway is not valid.',
 	'errunknown' => 'some unknown technical issue.',
-	'errsignon' => 'invalid security token',
+	'errsignon' => 'Your order cannot be completed at this time. If you need further assistance please contact customer care. Error Code 8124',
 	'errmrchtid' => 'Invalid merchant credential',
 	'errpannum' => 'Invalid credit card number',
 	'errexpire' => 'Invalid expiry month and/or year',
@@ -37,5 +37,12 @@ class Velocity_Message
 	'errreturntranidwid' => 'Authentication failed due to Security token not validate',
 	'erramtnotset' => 'Amount must be set!',
 	'errcarddatatokennotset' => 'Invalid card detail.',
+      
+        // querytransactiondetail
+        'errqtdtctp' => 'Error in TransactionClass or TransactionType.',
+        'errqtp' => 'Error in transaction parameters.',
+        'errpp' => 'Error in transaction parameters.',
+        'errqtd' => 'Error in query transaction detail.',
+        'errqtpdaterange' => 'Error in date range setting or format may not support.'
   );
 }

@@ -5,7 +5,7 @@
 	$merchantprofileid = "PrestaShop Global HC"; // merchantprofileid provided velocity;
 	$workflowid = 2317000001; // workflowid provided velocity
 	$isTestAccount = true;
-	$obj_transaction = new Velocity_Processor( $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken );
+	$obj_transaction = new VelocityProcessor( $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken );
 	$sessionToken = $obj_transaction->sessionToken;
 ?>
 <html>
