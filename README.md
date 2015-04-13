@@ -375,4 +375,112 @@ try {
 } catch(Exception $e) {
 	echo $e->getMessage();
 }
-```   
+``` 
+####For below all credential provided by velocity gateway. 
+$SecurePaymentAccountData
+
+$EncryptionKeyId
+
+####P2PE for Authorize:
+
+    try{
+        $response = $velocityProcessor->authorize(
+		        array( 
+                            'amount' => $cash, 
+                            'p2pedata' => array(
+                             'SecurePaymentAccountData' => $SecurePaymentAccountData,
+                                'EncryptionKeyId' => $EncryptionKeyId
+                            ),
+                            'order_id' => '629203'
+                        )
+                );
+     } catch (Exception $ex) {
+		echo $e->getMessage();
+    }
+
+####P2PE for AuthorizeandCapture:
+
+    try{
+        $response = $velocityProcessor->authorizeAndCapture(
+		            array( 
+                            'amount' => $cash, 
+                            'p2pedata' => array(
+                            'SecurePaymentAccountData' => $SecurePaymentAccountData,
+                            'EncryptionKeyId' => $EncryptionKeyId
+                            ),
+                            'order_id' => '629203'
+                        )
+                    );
+      } catch (Exception $ex) {
+		echo $e->getMessage();
+      }
+
+
+####P2PE for ReturnUnlinked:
+
+    try{
+            $response = $velocityProcessor->returnUnlinked (
+		           array( 
+                            'amount' => $cash, 
+                            'p2pedata' => array(
+                            'SecurePaymentAccountData' => $SecurePaymentAccountData,
+                            'EncryptionKeyId' => $EncryptionKeyId
+                            ),
+                            'order_id' => '629203'
+                        )
+                     );
+    } catch (Exception $ex) {
+		echo $e->getMessage();
+    }
+
+
+####CaptureAll Method:
+
+    try{
+            $velocityProcessor->captureAll();
+    } catch (Exception $ex) {
+		echo $e->getMessage();
+    }
+
+
+
+####QueryTransactionDetail Method:
+
+    try {
+	        $response = $VelocityProcessor->queryTransactionsDetail (
+					array(
+							'querytransactionparam' => array(
+							'Amounts' => array(10.00),
+							'ApprovalCodes' => array('VI0000'),
+							'BatchIds' => array('0539'),
+							'CaptureDateRange' => array(
+								'EndDateTime' => '2015-03-17 02:03:40',
+								'StartDateTime' => '2015-03-13 02:03:40'
+							),
+							'CaptureStates' => array('ReadyForCapture'),
+							'CardTypes' => array('Visa'),
+							'MerchantProfileIds' => array('PrestaShop Global HC'),
+							'OrderNumbers' => array('629203'),
+							'ServiceIds' => array('2317000001'),
+							'ServiceKeys' => array('FF3BB6DC58300001'),
+							'TransactionClassTypePairs' => array( array(
+							    'TransactionClass' => 'CREDIT',
+								'TransactionType' => 'AUTHONLY'
+							    )
+							),
+							'TransactionDateRange' => array(
+								'EndDateTime' => '2015-03-17 02:03:40',
+								'StartDateTime' => '2015-03-13 02:03:40'
+							),
+							'TransactionIds' =>             array('9B935E96763F43C3866F603319BE7B52'),
+							'TransactionStates' => array('Authorized')                        
+							),
+							'PagingParameters' => array(
+								'page' => '0',
+								'pagesize' => '3'
+							),
+			        	));
+    } catch(Exception $e) {
+	    echo $e->getMessage();
+    }
+  

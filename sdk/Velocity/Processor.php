@@ -4,24 +4,24 @@
  * It can be used to query and verify/authorize/authorizeandcapture/capture/undo/adjust/returnbyid/returnunlinked transactions.
  */
 
-class Velocity_Processor 
+class VelocityProcessor 
 {
 	/* -- Properties -- */
 
 	private $isNew;
 	private $connection;
 	public $sessionToken ;
-	public $messages = array();
-	public $errors = array();
-	public static $Txn_method = array('verify', 'authorize', 'authorizeandcapture', 'capture', 'adjust', 'undo', 'returnbyid', 'returnunlinked'); // array of method name to identify method request for common process
+	public static $Txn_method = array('verify', 'authorize', 'authorizeandcapture', 'capture', 'adjust', 'undo', 'returnbyid', 'returnunlinked', 'querytransactionsdetail', 'captureall'); // array of method name to identify method request for common process
 	public static $identitytoken;
 	public static $applicationprofileid;
 	public static $merchantprofileid;
 	public static $workflowid;
 	public static $isTestAccount;
+        private $transactionDetailFormat = 'CWSTransaction';
+        private $includeRelated = false;
 
 	public function __construct($applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken = null, $sessiontoken = null ) {
-		$this->connection = Velocity_Connection::instance(); // velocity_connection class object store in private data member $connection. 
+		$this->connection = VelocityConnection::instance(); // VelocityConnection class object store in private data member $connection. 
 		self::$identitytoken = $identitytoken;
 		self::$applicationprofileid = $applicationprofileid;
 		self::$merchantprofileid = $merchantprofileid;
@@ -49,7 +49,7 @@ class Velocity_Processor
 		
 		try { 
 																
-			$xml = Velocity_XmlCreator::verify_XML($options);  // got Verify xml object.
+			$xml = VelocityXmlCreator::verifyXML($options);  // got Verify xml object.
 			$xml->formatOutput = TRUE;
 			$body = $xml->saveXML();
 			//echo '<xmp>'.$body.'</xmp>'; die;
@@ -83,10 +83,10 @@ class Velocity_Processor
 
 		try {
 		
-			$xml = Velocity_XmlCreator::authandcap_XML($options);  // got authorizeandcapture xml object. 
+			$xml = VelocityXmlCreator::authorizeandcaptureXML($options);  // got authorizeandcapture xml object. 
 			$xml->formatOutput = TRUE;
 			$body = $xml->saveXML();
-			//echo '<xmp>'.$body.'</xmp>'; die;
+			//echo '<xmp>'.$body.'</xmp>';
 			list($error, $response) = $this->connection->post(
                                                                             $this->path(
                                                                                     self::$workflowid, 
@@ -118,10 +118,10 @@ class Velocity_Processor
 	public function authorize($options = array()) {
 
 		try {
-			$xml = Velocity_XmlCreator::auth_XML($options);  // got authorize xml object.
+			$xml = VelocityXmlCreator::authorizeXML($options); // got authorize xml object.
 			$xml->formatOutput = TRUE;
 			$body = $xml->saveXML();
-			//echo '<xmp>'.$body.'</xmp>'; die;
+			//echo '<xmp>'.$body.'</xmp>'; 
 			list($error, $response) = $this->connection->post(
                                                                             $this->path(
                                                                                     self::$workflowid, 
@@ -153,21 +153,21 @@ class Velocity_Processor
 		if(isset($options['amount']) && isset($options['TransactionId'])) {
 			$amount = number_format($options['amount'], 2, '.', '');
 			try {
-				$xml = Velocity_XmlCreator::cap_XML($options['TransactionId'], $amount);  // got capture xml object.  
+				$xml = VelocityXmlCreator::captureXML($options['TransactionId'], $amount);  // got capture xml object.  
 				$xml->formatOutput = TRUE;
 				$body = $xml->saveXML();
 				//echo '<xmp>'.$body.'</xmp>'; die;
 				list($error, $response) = $this->connection->put(
                                                                                 $this->path(
-                                                                                                                self::$workflowid, 
-                                                                                                                $options['TransactionId'], 
-                                                                                                                self::$Txn_method[3]
-                                                                                                        ), 
+                                                                                            self::$workflowid, 
+                                                                                            $options['TransactionId'], 
+                                                                                            self::$Txn_method[3]
+                                                                                    ), 
                                                                                  array(
-                                                                                                'sessiontoken' => $this->sessionToken, 
-                                                                                                'xml' => $body, 
-                                                                                                'method' => self::$Txn_method[3]
-                                                                                          )
+                                                                                        'sessiontoken' => $this->sessionToken, 
+                                                                                        'xml' => $body, 
+                                                                                        'method' => self::$Txn_method[3]
+                                                                                      )
                                                                         );
 				//return $response;
 				return $this->handleResponse($error, $response);
@@ -176,8 +176,37 @@ class Velocity_Processor
 			}
 			
 		} else {
-		    throw new Exception(Velocity_Message::$descriptions['errcapsesswfltransid']);
+		    throw new Exception(VelocityMessage::$descriptions['errcapsesswfltransid']);
 		}
+	}
+        
+        /*
+	* Captures all authorization. Optionally specify an `$amount` to do a partial capture of the initial
+	* authorization. The default is to capture the full amount of the authorization.
+	* @param array $options this is hold the null array. 
+	* @return array $this->handleResponse($error, $response) array of successfull or failure of gateway response.
+	*/
+	public function captureAll($options = array()) {
+		
+            try {
+                    $xml = VelocityXmlCreator::captureAllXML();  // got capture xml object.  
+                    $xml->formatOutput = TRUE;
+                    $body = $xml->saveXML();
+                    //echo '<xmp>'.$body.'</xmp>'; die;
+                    list($error, $response) = $this->connection->put(
+                                                                    'Txn/'.self::$workflowid, 
+                                                                     array(
+                                                                            'sessiontoken' => $this->sessionToken, 
+                                                                            'xml' => $body, 
+                                                                            'method' => self::$Txn_method[9]
+                                                                           )
+                                                            );
+                    return $response;
+                    //return $this->handleResponse($error, $response);
+            } catch(Exception $e) {
+                    throw new Exception($e->getMessage());
+            }
+			
 	}
 
 	/*
@@ -191,7 +220,7 @@ class Velocity_Processor
 		if( isset($options['amount']) && isset($options['TransactionId']) ) {
 			$amount = number_format($options['amount'], 2, '.', '');
 			try {
-				$xml = Velocity_XmlCreator::adjust_XML($options['TransactionId'], $amount);  // got adjust xml object.  
+				$xml = VelocityXmlCreator::adjustXML($options['TransactionId'], $amount);  // got adjust xml object.  
 				$xml->formatOutput = TRUE;
 				$body = $xml->saveXML();
 				//echo '<xmp>'.$body.'</xmp>'; die;
@@ -214,7 +243,7 @@ class Velocity_Processor
 			}	
 			
 		} else {
-			throw new Exception(Velocity_Message::$descriptions['erradjustsesswfltransid']);
+			throw new Exception(VelocityMessage::$descriptions['erradjustsesswfltransid']);
 		}
 	}
 	
@@ -229,7 +258,7 @@ class Velocity_Processor
 		if ( isset($options['TransactionId']) ) {
 		
 			try {
-				$xml = Velocity_XmlCreator::undo_XML($options['TransactionId']);  // got undo xml object.  
+				$xml = VelocityXmlCreator::undoXML($options['TransactionId']);  // got undo xml object.  
 				$xml->formatOutput = TRUE;
 				$body = $xml->saveXML();
 				list($error, $response) = $this->connection->put( 
@@ -251,7 +280,7 @@ class Velocity_Processor
 			}
 			
 		} else {
-			throw new Exception(Velocity_Message::$descriptions['errundosesswfltransid']);
+			throw new Exception(VelocityMessage::$descriptions['errundosesswfltransid']);
 		}
 	}
 	
@@ -267,7 +296,7 @@ class Velocity_Processor
 		if(isset($options['amount']) && isset($options['TransactionId'])) {
 			$amount = number_format($options['amount'], 2, '.', '');
 			try {
-				$xml = Velocity_XmlCreator::returnById_XML($amount, $options['TransactionId']);  // got ReturnById xml object. 
+				$xml = VelocityXmlCreator::returnByIdXML($amount, $options['TransactionId']);  // got ReturnById xml object. 
 				$xml->formatOutput = TRUE;
 				$body = $xml->saveXML();
 				//echo '<xmp>'.$body.'</xmp>'; die;
@@ -290,7 +319,7 @@ class Velocity_Processor
 			}
 			
 		} else {
-			throw new Exception(Velocity_Message::$descriptions['errreturntranidwid']);
+			throw new Exception(VelocityMessage::$descriptions['errreturntranidwid']);
 		}  
 	}
 
@@ -304,10 +333,10 @@ class Velocity_Processor
 	public function returnUnlinked($options = array()) {
 		
 		try {
-			$xml = Velocity_XmlCreator::returnunlinked_XML($options);  // got ReturnById xml object. 
+			$xml = VelocityXmlCreator::returnUnlinkedXML($options);  // got ReturnById xml object. 
 			$xml->formatOutput = TRUE;
 			$body = $xml->saveXML();
-			//echo '<xmp>'.$body.'</xmp>'; die;
+			//echo '<xmp>'.$body.'</xmp>';
 			list($error, $response) = $this->connection->post(
                                                                             $this->path(
                                                                                     self::$workflowid, 
@@ -328,6 +357,35 @@ class Velocity_Processor
 		  
 	}
 
+        /*
+	 * The QueryTransactionsDetail operation is used to display the transaction detail on the behalf of some parameter(txtid, ammount etc).
+	 * This operation is useful to show the detail of multiple transaction detail as request parameter.
+	 * @param array $guerytxndetail this array hold "querytransactionparam" array and PagingParameters array.
+	 * @return array $response array of successfull. 
+	 */
+	public function queryTransactionsDetail($guerytxndetail) {
+
+		try {
+
+                        $Qtxnparams = new QueryTransactionsParameters($guerytxndetail['querytransactionparam']);
+                        $pagingParameters = new PagingParameters($guerytxndetail['PagingParameters']);
+                        $qtd = new QueryTransactionsDetail($this->includeRelated, $pagingParameters, $Qtxnparams, $this->transactionDetailFormat);
+                        $body = (string)json_encode($qtd);
+			//echo '<pre>'.$body.'</pre>'; die;
+			list($error, $response) = $this->connection->post('DataServices/TMS/transactionsDetail',
+                                                                            array(
+                                                                                    'sessiontoken' =>  $this->sessionToken, 
+                                                                                    'xml' => $body, 
+                                                                                    'method' => self::$Txn_method[8]
+                                                                            )
+                                                                     );
+
+			return $response;
+		} catch (Exception $e) {
+			throw new Exception($e->getMessage());
+		}
+		  
+	}
 	
 	/* path for according to request needed 
 	 * @param string $arg1 part of url for request.
@@ -343,7 +401,7 @@ class Velocity_Processor
 			$path = 'Txn/'.$arg1;
 			return $path;
 		} else {
-			throw new Exception(Velocity_Message::$descriptions['errcapadjpath']);
+			throw new Exception(VelocityMessage::$descriptions['errcapadjpath']);
 		}
 	}
 	
@@ -355,9 +413,10 @@ class Velocity_Processor
 	* @param object $error error message created on the basis of gateway error status. 
 	* @param array $response gateway response deatil. 
 	* @return object $error error detail of gateway response.
-    * @return array $response successfull/failure response of gateway.
+        * @return array $response successfull/failure response of gateway.
 	*/
 	public function handleResponse($error, $response) {
+                        
 		if ($error) {
 			  return $this->processError($error, $response);
 		} else {
@@ -367,53 +426,30 @@ class Velocity_Processor
 				} else if ( isset($response['BankcardCaptureResponse']) ) {
 					return $response['BankcardCaptureResponse'];
 				} else {
-					return $response;
+					return $this->processError($error, $response);
 				}
-			}
+                    }
 		}
 	}
 	
-	/*
+       /*
 	* Parses the Velocity response for error messages
 	* @param object $error error message created on the basis of gateway error status. 
 	* @param array $response gateway error response detail. 
 	* @return object $error detail created on the basis of gateway error status.
 	*/
-	public function processError($error, $response) {
-		if ( isset($response) )
-			return $response;
-		else
+	private function processError($error, $response) {
+		if ( isset($response) ) {
+                        $valerr = '';
+			$reson = isset($response['ErrorResponse']['Reason']) ? $response['ErrorResponse']['Reason'] : NULL;
+                        $valError = is_array($response['ErrorResponse']['ValidationErrors']) ? $response['ErrorResponse']['ValidationErrors'] : array();
+                        $valerr .= $reson . '<br>';
+                        foreach ($valError as $key => $value) {
+                            $valerr .= $value['RuleMessage'] . '<br>';
+                        }
+                        return $valerr;
+                } else
 			return $error;
 		
-		$reson = isset($response['ErrorResponse']['Reason']) ? $response['ErrorResponse']['Reason'] : 'ERR';
-		$validationErrors = isset($response['ErrorResponse']['ValidationErrors']) ? $response['ErrorResponse']['ValidationErrors'] : 'ERR';
-		$rulemsg = isset($response['ErrorResponse']['ValidationErrors']['ValidationError']['RuleMessage']) ? $response['ErrorResponse']['ValidationErrors']['ValidationError']['RuleMessage'] : '';
-		$rulekey = isset($response['ErrorResponse']['ValidationErrors']['ValidationError']['RuleKey']) ? $response['ErrorResponse']['ValidationErrors']['ValidationError']['RuleKey'] : '';
-		$errorid = isset($response['ErrorResponse']['ErrorId']) ? $response['ErrorResponse']['ErrorId'] : 'ERR';
-
-		if( $reson != 'ERR' && $validationErrors != 'ERR' && $validationErrors == '') {
-			throw new Exception( $response['ErrorResponse']['Reason'] );
-		} else if ( $reson != 'ERR' && $errorid != 'ERR' && $errorid == '9999' ) {
-			throw new Exception( Velocity_Message::$descriptions['erstatecode'] );
-		} else if ( $reson != 'ERR' && $validationErrors != 'ERR' && $validationErrors != '') {
-		
-			if ( count($validationErrors) == 13 )
-				throw new Exception( Velocity_Message::$descriptions['errmrchtid'] );
-			else if ( $rulemsg != '' && $rulekey != '' && $rulekey == 'TenderData.CardData.PAN')  
-				throw new Exception( Velocity_Message::$descriptions['errpannum'] );
-			else if ( $rulemsg != '' && $rulekey != '' && $rulekey == 'TenderData.CardData.Expire')  
-				throw new Exception( Velocity_Message::$descriptions['errexpire'] );
-			else if ( $rulemsg != '' && $rulekey != '' && $rulekey == 'TenderData.CardData.CVData')  
-				throw new Exception( Velocity_Message::$descriptions['errcvdata'] );	
-			else if ( $rulemsg != '' )	
-				throw new Exception( $rulekey );
-			else 
-				throw new Exception( Velocity_Message::$descriptions['errunknown'] );
-				
-		} else if ($response == '') {
-			return $error;
-		} else {
-			throw new Exception( Velocity_Message::$descriptions['errunknown'] );
-		}
 	}
 }
