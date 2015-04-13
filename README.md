@@ -154,7 +154,9 @@ Then you can perform the transaction:
 	));
 ```
 
-#### Authorize method with token 
+The rest of the payment methods can be found below:
+
+#### Authorize method
 
 ```            
 try {
@@ -188,48 +190,6 @@ try {
 } catch (Exception $e) {
 	echo $e->getMessage();	
 }        
-```
-
-#### Authorize method without token  
-
-```
-try {
-	
-	$response = $velocityProcessor->authorize(array(
-		'amount' => 10,  
-		'avsdata' => array(   
-			'Street' => 'xyz', 
-			'City' => 'cityname', 
-			'StateProvince' => 'statecode', 
-			'PostalCode' => 'postcode', 
-			'Country' => 'countrycode three letter'
-			),
-		'carddata' => array(    
-			'cardowner' => 'Jane Doe', 
-			'cardtype' => 'Visa', 
-			'pan' => '4012888812348882', 
-			'expire' => '1215', 
-			'cvv' => '123'
-		),
-		'order_id' => '629203'
-	)); 
- 
-	if (isset($response['Status']) && $response['Status'] == 'Successful') {
-		echo 'Authorize Successful!</br>';
-		echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
-		echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
-		echo 'Amount: ' . $response['Amount'] . '</br>'; 
-		echo 'TransactionId: ' . $response['TransactionId']; 
-	} else {
-		// some error
-		print_r($response);
-	}
-	
-	$authTransactionid = $response['TransactionId'];
-		
-} catch (Exception $e) {
-	echo $e->getMessage();
-}      
 ```
 
 #### Capture                
@@ -347,36 +307,6 @@ try {
 	echo $e->getMessage();
 }
 ```
- 
-#### ReturnUnlinked without token
-
-```           
-try {
-				
-	$response = $velocityProcessor->returnUnlinked(array( 
-		'amount' => 1.03, 
-		'carddata' => array(    
-			'cardowner' => 'Jane Doe', 
-			'cardtype' => 'Visa', 
-			'pan' => '4012888812348882', 
-			'expire' => '1215', 
-			'cvv' => '123'
-		),
-		'order_id' => '629203'
-	));
-		
-	if (isset($response['Status']) && $response['Status'] == 'Successful') {
-		echo 'ReturnUnlinked Successful!</br>';
-		echo 'ApprovalCode: ' . $response['ApprovalCode'] . '</br></br>'; 
-	} else {
-		// some error
-		print_r($response);
-	}
-
-} catch (Exception $e) {
-	echo $e->getMessage();
-}
-```
 
 #### Verify method            
 
@@ -414,65 +344,19 @@ try {
 }
 ``` 
 
-####P2PE for Authorize:
-
-    try{
-        $response = $velocityProcessor->authorize(array( 
-			'amount' => $cash, 
-			'p2pedata' => array(
-				'SecurePaymentAccountData' => $SecurePaymentAccountData,
-				'EncryptionKeyId' => $EncryptionKeyId
-			),
-			'order_id' => '629203'
-		));
-     } catch (Exception $ex) {
-		echo $e->getMessage();
-    }
-
-####P2PE for AuthorizeandCapture:
-
-    try{
-        $response = $velocityProcessor->authorizeAndCapture(array( 
-			'amount' => $cash, 
-			'p2pedata' => array(
-				'SecurePaymentAccountData' => $SecurePaymentAccountData,
-				'EncryptionKeyId' => $EncryptionKeyId
-			),
-			'order_id' => '629203'
-		));
-	} catch (Exception $ex) {
-		echo $e->getMessage();
-	}
-
-
-####P2PE for ReturnUnlinked:
-
-    try{
-		$response = $velocityProcessor->returnUnlinked (
-			'amount' => $cash, 
-			'p2pedata' => array(
-				'SecurePaymentAccountData' => $SecurePaymentAccountData,
-				'EncryptionKeyId' => $EncryptionKeyId
-			),
-			'order_id' => '629203'
-		));
-    } catch (Exception $ex) {
-		echo $e->getMessage();
-    }
-
-
 ####CaptureAll Method:
 
+```
     try{
 		$velocityProcessor->captureAll();
     } catch (Exception $ex) {
 		echo $e->getMessage();
     }
-
-
+```
 
 ####QueryTransactionDetail Method:
 
+```
     try {
 		$response = $VelocityProcessor->queryTransactionsDetail(array(
 			'querytransactionparam' => array(
@@ -509,4 +393,4 @@ try {
     } catch(Exception $e) {
 	    echo $e->getMessage();
     }
-  
+```
