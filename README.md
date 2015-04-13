@@ -27,7 +27,7 @@ $workflowid = 2317000001;
 $isTestAccount = true; 
 
 try {
-	$velocity_processor = new Velocity_Processor($applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken);
+	$velocityProcessor = new Velocity_Processor($applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken);
 } catch (Exception $e) {
 	echo $e->getMessage();
 }
@@ -37,14 +37,16 @@ Here we instantiate the processor in order to use it to process payments.  It ta
 
 #### 3. Use payment methods of processor 
 
-To understand the Authorization & Capture process, please read our [Integration Guidance](http://docs.nabvelocity.com/hc/en-us/articles/202966458-Integration-Guidance-Transaction-Processing).  Also, the [tokenization process](http://docs.nabvelocity.com/hc/en-us/articles/202551793-Value-Added-Service-Provider-Guidelines-Tokenization) should be understood.  For each payment method taking cardholder data below (Authorize, AuthorizeAndCapture, ReturnUnlinked) an example is given both with and without token.  Tokens are obtained from a solution like the Transparent Redirect, or by a direct call to Verify via the SDK.  Utilizing tokens can help reduce your PCI scope.
+To understand the Authorization & Capture process, please read our [Integration Guidance](http://docs.nabvelocity.com/hc/en-us/articles/202966458-Integration-Guidance-Transaction-Processing).  Also, the [tokenization process](http://docs.nabvelocity.com/hc/en-us/articles/202551793-Value-Added-Service-Provider-Guidelines-Tokenization) should be understood.  For each payment method taking cardholder data below (Authorize, AuthorizeAndCapture, ReturnUnlinked) there are four different payment methods:  Keyed data, swiped data, tokenized data, or encrypted data.  While swiped and keyed data are obtained directly from the card, tokenized data is obtained from a solution like the Transparent Redirect, or by a direct call to Verify via the SDK.  Utilizing tokens can help reduce your PCI scope.  Encrypted data is obtained from an encrypted card reader and can also greatly reduce your PCI scope.  Ask your Velocity representative for more information on any of these payment methods.
+
+Below is an example of an authorize and capture with each of the different payment methods:
 
 #### Authorize and capture with token              
 
 ```
 try {
 	
-	$response = $velocity_processor->authorizeAndCapture(array(
+	$response = $velocityProcessor->authorizeAndCapture(array(
 		'amount' => 10.03, 
 		'avsdata' => array(   
 			'Street' => 'xyz', 
@@ -75,12 +77,11 @@ try {
 } 
 ```
 
-#### Authorize and capture without token 
+#### Authorize and capture with keyed data
 
 ```          
 try {	
-
-	$response = $velocity_processor->authorizeAndCapture(array(
+	$response = $velocityProcessor->authorizeAndCapture(array(
 		'amount' => 10.03, 
 		'avsdata' => array(   
 			'Street' => 'xyz', 
@@ -98,23 +99,59 @@ try {
 		),
 		'order_id' => '629203',
 	));
+```
 
-	if (isset($response['Status']) && $response['Status'] == 'Successful') {
-		echo 'AuthorizeAndCapture Successful!</br>';
-		echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
-		echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
-		echo 'Amount: ' . $response['Amount'] . '</br>'; 
-		echo 'TransactionId: ' . $response['TransactionId']; 
-	} else {
-		// some error
-		print_r($response);
+### Authorize and capture with swiped data
+
+```          
+	$response = $velocityProcessor->authorizeAndCapture(array(
+		'amount' => 10.03, 
+		'avsdata' => array(   
+			'Street' => 'xyz', 
+			'City' => 'cityname', 
+			'StateProvince' => 'statecode', 
+			'PostalCode' => 'postcode', 
+			'Country' => 'countrycode three letter'
+		 ),
+		'carddata' => array(    
+			'track2data' => '4012000033330026=09041011000012345678', 
+			'cardtype' => 'Visa'
+		),
+		'order_id' => '629203',
+	));
+```
+
+### Authorize and capture with encrypted data
+
+Before doing the actualy transaction, you must re-instantiate your processor with the proper workflow id (provided by your velocity representative):
+
+```
+	$workflowid = 'BBBAAA0001';
+	try {
+		$velocityProcessor = new VelocityProcessor( $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken );
+	} catch (Exception $e) {
+	    echo $e->getMessage();
 	}
-		
-	$authCapTransactionid = $response['TransactionId'];
+```
 
-} catch(Exception $e) {
-	echo $e->getMessage(); 
-}
+Then you can perform the transaction:
+
+```          
+	$response = $velocityProcessor->authorizeAndCapture(array(
+		'amount' => 10.03, 
+		'avsdata' => array(   
+			'Street' => 'xyz', 
+			'City' => 'cityname', 
+			'StateProvince' => 'statecode', 
+			'PostalCode' => 'postcode', 
+			'Country' => 'countrycode three letter'
+		 ),
+		'p2pedata' => array(
+			'SecurePaymentAccountData' => '576F2E197D5804F2B6201FB2578DCD1DDDC7BAE692FE48E9C368E678914233561FB953DF47E29F88',
+			'EncryptionKeyId' => '9010010B257DC7000084'
+		),
+		'order_id' => '629203',
+	));
 ```
 
 #### Authorize method with token 
@@ -122,7 +159,7 @@ try {
 ```            
 try {
 	
-	$response = $velocity_processor->authorize(array(
+	$response = $velocityProcessor->authorize(array(
 		'amount' => 10,  
 		'avsdata' => array(   
 			'Street' => 'xyz', 
@@ -158,7 +195,7 @@ try {
 ```
 try {
 	
-	$response = $velocity_processor->authorize(array(
+	$response = $velocityProcessor->authorize(array(
 		'amount' => 10,  
 		'avsdata' => array(   
 			'Street' => 'xyz', 
@@ -200,7 +237,7 @@ try {
 ```
 try {
 	
-	$response = $velocity_processor->capture(array(
+	$response = $velocityProcessor->capture(array(
 		'amount' => 6.03, 
 		'TransactionId' => $authTransactionid
 	));	
@@ -225,7 +262,7 @@ try {
 ```
 try {
 	
-	$response = $velocity_processor->undo(array(
+	$response = $velocityProcessor->undo(array(
 		'TransactionId' => $adjusttxnid
 	));
 	
@@ -247,7 +284,7 @@ try {
 ```     
 try {
 		
-	$response = $velocity_processor->adjust(array(
+	$response = $velocityProcessor->adjust(array(
 		'amount' => 3.01, 
 		'TransactionId' => $captxnid
 	));
@@ -269,7 +306,7 @@ try {
 
 ```
 try {
-	$response = $velocity_processor->returnById(array(
+	$response = $velocityProcessor->returnById(array(
 		'amount' => 5.03, 
 		'TransactionId' => $authCapTransactionid
 	));
@@ -292,7 +329,7 @@ try {
 ```             
 try {
 				
-	$response = $velocity_processor->returnUnlinked(array( 
+	$response = $velocityProcessor->returnUnlinked(array( 
 		'amount' => 1.03, 
 		'token' => $paymentAccountDataToken, 
 		'order_id' => '629203'
@@ -316,7 +353,7 @@ try {
 ```           
 try {
 				
-	$response = $velocity_processor->returnUnlinked(array( 
+	$response = $velocityProcessor->returnUnlinked(array( 
 		'amount' => 1.03, 
 		'carddata' => array(    
 			'cardowner' => 'Jane Doe', 
@@ -346,7 +383,7 @@ try {
 ```   
 try {
 	
-	$response = $velocity_processor->verify(array(  									
+	$response = $velocityProcessor->verify(array(  									
 		'avsdata' => array(   
 			'Street' => 'xyz', 
 			'City' => 'cityname', 
@@ -376,24 +413,18 @@ try {
 	echo $e->getMessage();
 }
 ``` 
-####For below all credential provided by velocity gateway. 
-$SecurePaymentAccountData
-
-$EncryptionKeyId
 
 ####P2PE for Authorize:
 
     try{
-        $response = $velocityProcessor->authorize(
-		        array( 
-                            'amount' => $cash, 
-                            'p2pedata' => array(
-                             'SecurePaymentAccountData' => $SecurePaymentAccountData,
-                                'EncryptionKeyId' => $EncryptionKeyId
-                            ),
-                            'order_id' => '629203'
-                        )
-                );
+        $response = $velocityProcessor->authorize(array( 
+			'amount' => $cash, 
+			'p2pedata' => array(
+				'SecurePaymentAccountData' => $SecurePaymentAccountData,
+				'EncryptionKeyId' => $EncryptionKeyId
+			),
+			'order_id' => '629203'
+		));
      } catch (Exception $ex) {
 		echo $e->getMessage();
     }
@@ -401,34 +432,30 @@ $EncryptionKeyId
 ####P2PE for AuthorizeandCapture:
 
     try{
-        $response = $velocityProcessor->authorizeAndCapture(
-		            array( 
-                            'amount' => $cash, 
-                            'p2pedata' => array(
-                            'SecurePaymentAccountData' => $SecurePaymentAccountData,
-                            'EncryptionKeyId' => $EncryptionKeyId
-                            ),
-                            'order_id' => '629203'
-                        )
-                    );
-      } catch (Exception $ex) {
+        $response = $velocityProcessor->authorizeAndCapture(array( 
+			'amount' => $cash, 
+			'p2pedata' => array(
+				'SecurePaymentAccountData' => $SecurePaymentAccountData,
+				'EncryptionKeyId' => $EncryptionKeyId
+			),
+			'order_id' => '629203'
+		));
+	} catch (Exception $ex) {
 		echo $e->getMessage();
-      }
+	}
 
 
 ####P2PE for ReturnUnlinked:
 
     try{
-            $response = $velocityProcessor->returnUnlinked (
-		           array( 
-                            'amount' => $cash, 
-                            'p2pedata' => array(
-                            'SecurePaymentAccountData' => $SecurePaymentAccountData,
-                            'EncryptionKeyId' => $EncryptionKeyId
-                            ),
-                            'order_id' => '629203'
-                        )
-                     );
+		$response = $velocityProcessor->returnUnlinked (
+			'amount' => $cash, 
+			'p2pedata' => array(
+				'SecurePaymentAccountData' => $SecurePaymentAccountData,
+				'EncryptionKeyId' => $EncryptionKeyId
+			),
+			'order_id' => '629203'
+		));
     } catch (Exception $ex) {
 		echo $e->getMessage();
     }
@@ -437,7 +464,7 @@ $EncryptionKeyId
 ####CaptureAll Method:
 
     try{
-            $velocityProcessor->captureAll();
+		$velocityProcessor->captureAll();
     } catch (Exception $ex) {
 		echo $e->getMessage();
     }
@@ -447,39 +474,38 @@ $EncryptionKeyId
 ####QueryTransactionDetail Method:
 
     try {
-	        $response = $VelocityProcessor->queryTransactionsDetail (
-					array(
-							'querytransactionparam' => array(
-							'Amounts' => array(10.00),
-							'ApprovalCodes' => array('VI0000'),
-							'BatchIds' => array('0539'),
-							'CaptureDateRange' => array(
-								'EndDateTime' => '2015-03-17 02:03:40',
-								'StartDateTime' => '2015-03-13 02:03:40'
-							),
-							'CaptureStates' => array('ReadyForCapture'),
-							'CardTypes' => array('Visa'),
-							'MerchantProfileIds' => array('PrestaShop Global HC'),
-							'OrderNumbers' => array('629203'),
-							'ServiceIds' => array('2317000001'),
-							'ServiceKeys' => array('FF3BB6DC58300001'),
-							'TransactionClassTypePairs' => array( array(
-							    'TransactionClass' => 'CREDIT',
-								'TransactionType' => 'AUTHONLY'
-							    )
-							),
-							'TransactionDateRange' => array(
-								'EndDateTime' => '2015-03-17 02:03:40',
-								'StartDateTime' => '2015-03-13 02:03:40'
-							),
-							'TransactionIds' =>             array('9B935E96763F43C3866F603319BE7B52'),
-							'TransactionStates' => array('Authorized')                        
-							),
-							'PagingParameters' => array(
-								'page' => '0',
-								'pagesize' => '3'
-							),
-			        	));
+		$response = $VelocityProcessor->queryTransactionsDetail(array(
+			'querytransactionparam' => array(
+			'Amounts' => array(10.00),
+			'ApprovalCodes' => array('VI0000'),
+			'BatchIds' => array('0539'),
+			'CaptureDateRange' => array(
+				'EndDateTime' => '2015-03-17 02:03:40',
+				'StartDateTime' => '2015-03-13 02:03:40'
+			),
+			'CaptureStates' => array('ReadyForCapture'),
+			'CardTypes' => array('Visa'),
+			'MerchantProfileIds' => array('PrestaShop Global HC'),
+			'OrderNumbers' => array('629203'),
+			'ServiceIds' => array('2317000001'),
+			'ServiceKeys' => array('FF3BB6DC58300001'),
+			'TransactionClassTypePairs' => array( array(
+				'TransactionClass' => 'CREDIT',
+				'TransactionType' => 'AUTHONLY'
+				)
+			),
+			'TransactionDateRange' => array(
+				'EndDateTime' => '2015-03-17 02:03:40',
+				'StartDateTime' => '2015-03-13 02:03:40'
+			),
+			'TransactionIds' =>             array('9B935E96763F43C3866F603319BE7B52'),
+			'TransactionStates' => array('Authorized')                        
+			),
+			'PagingParameters' => array(
+				'page' => '0',
+				'pagesize' => '3'
+			),
+		));
     } catch(Exception $e) {
 	    echo $e->getMessage();
     }
