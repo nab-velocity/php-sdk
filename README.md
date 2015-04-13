@@ -37,9 +37,9 @@ Here we instantiate the processor in order to use it to process payments.  It ta
 
 #### 3. Use payment methods of processor 
 
-To understand the Authorization & Capture process, please read our [Integration Guidance](http://docs.nabvelocity.com/hc/en-us/articles/202966458-Integration-Guidance-Transaction-Processing).  Also, the [tokenization process](http://docs.nabvelocity.com/hc/en-us/articles/202551793-Value-Added-Service-Provider-Guidelines-Tokenization) should be understood.  For each payment method taking cardholder data below (Authorize, AuthorizeAndCapture, ReturnUnlinked) there are four different payment methods:  Keyed data, swiped data, tokenized data, or encrypted data.  While swiped and keyed data are obtained directly from the card, tokenized data is obtained from a solution like the Transparent Redirect, or by a direct call to Verify via the SDK.  Utilizing tokens can help reduce your PCI scope.  Encrypted data is obtained from an encrypted card reader and can also greatly reduce your PCI scope.  Ask your Velocity representative for more information on any of these payment methods.
+To understand the Authorization & Capture process, please read our [Integration Guidance](http://docs.nabvelocity.com/hc/en-us/articles/202966458-Integration-Guidance-Transaction-Processing).  Also, the [tokenization process](http://docs.nabvelocity.com/hc/en-us/articles/202551793-Value-Added-Service-Provider-Guidelines-Tokenization) should be understood.  For each payment method taking cardholder data below (Authorize, AuthorizeAndCapture, ReturnUnlinked) you can use four different types of data:  Keyed data, swiped data, tokenized data, or encrypted data.  While swiped and keyed data are obtained directly from the card, tokenized data is obtained from a solution like the Transparent Redirect, or by a direct call to Verify via the SDK.  Utilizing tokens can help reduce your PCI scope.  Encrypted data is obtained from an encrypted card reader and can also greatly reduce your PCI scope.  
 
-Below is an example of an authorize and capture with each of the different payment methods:
+Below is an example of an authorize and capture with each of the different types of data:
 
 #### Authorize and capture with token              
 
