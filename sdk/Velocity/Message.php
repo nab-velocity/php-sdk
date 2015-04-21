@@ -13,7 +13,7 @@ class VelocityMessage
 	'errgetmethod' => 'Requested url of gateway is not valid.',
 	'errputmethod' => 'Requested url of gateway is not valid.',
 	'errunknown' => 'some unknown technical issue.',
-	'errsignon' => 'Your order cannot be completed at this time. If you need further assistance please contact customer care. Error Code 8124',
+	'errsignon' => 'An invalid security token was provided',
 	'errmrchtid' => 'Invalid merchant credential',
 	'errpannum' => 'Invalid credit card number',
 	'errexpire' => 'Invalid expiry month and/or year',
