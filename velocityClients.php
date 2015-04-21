@@ -37,7 +37,15 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	 * carddata optional for use SDK only without transparent redirect. 
 	 * Note: array key must be not change.  
 	 */
-	$cardData = array('cardowner' => 'Jane Doe', 'cardtype' => 'Visa', 'pan' => '4012888812348882', 'expire' => '1215', 'cvv' => '123');
+	$cardData = array(
+            'cardowner' => 'Jane Doe', 
+            'cardtype' => 'Visa', 
+            'pan' => '4012888812348882', 
+            'expire' => '1215', 
+            'cvv' => '123',
+            'track1data' => '',
+            'track2data' => ''
+            );
 	$trackData = array('track2data' => '4012000033330026=09041011000012345678', 'cardtype' => 'Visa');
 	
 	/* *****************************************************verify************************************************************************* */
@@ -47,6 +55,10 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 		$response = $VelocityProcessor->verify(array(  
 			'avsdata' => $avsData, 
 			'carddata' => $cardData,
+                        'entry_mode' => 'Keyed',
+                        'IndustryType' =>'Ecommerce',
+                        'Reference' => 'xyz',
+                        'EmployeeId' => '11'
 		)); 
  
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
@@ -72,6 +84,10 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 			'avsdata' => $avsData,
 			'token' => $paymentAccountDataToken, 
 			'order_id' => '629203',
+                        'entry_mode' => 'Keyed',
+                        'IndustryType' =>'Ecommerce',
+                        'Reference' => 'xyz',
+                        'EmployeeId' => '11'
 		));
 		
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
@@ -98,7 +114,11 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 		$response = $VelocityProcessor->authorize(array(
 			'amount' => 10,  
 			'carddata' => $cardData,
-			'order_id' => '629203'
+			'order_id' => '629203',
+                        'entry_mode' => 'Keyed',
+                        'IndustryType' =>'Ecommerce',
+                        'Reference' => 'xyz',
+                        'EmployeeId' => '11'
 		)); 
  
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
@@ -215,7 +235,11 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 		$response = $VelocityProcessor->returnUnlinked(array( 
 			'amount' => 1.03, 
 			'token' => $paymentAccountDataToken, 
-			'order_id' => '629203'
+			'order_id' => '629203',
+                        'entry_mode' => 'Keyed',
+                        'IndustryType' =>'Ecommerce',
+                        'Reference' => 'xyz',
+                        'EmployeeId' => '11'
 		));
 		
 		 
@@ -298,7 +322,11 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
                             'SecurePaymentAccountData' => '576F2E197D5804F2B6201FB2578DCD1DDDC7BAE692FE48E9C368E678914233561FB953DF47E29F88',
                             'EncryptionKeyId' => '9010010B257DC7000084'
                             ),
-			'order_id' => '629203'
+			'order_id' => '629203',
+                        'entry_mode' => 'TrackDataFromMSR',
+                        'IndustryType' =>'Retail',
+                        'Reference' => 'xyz',
+                        'EmployeeId' => '11'
 		)); 
  
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
@@ -327,7 +355,11 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
                             'SecurePaymentAccountData' => '576F2E197D5804F2B6201FB2578DCD1DDDC7BAE692FE48E9C368E678914233561FB953DF47E29F88',
                             'EncryptionKeyId' => '9010010B257DC7000084'
                              ),
-			'order_id' => '629203'
+			'order_id' => '629203',
+                        'entry_mode' => 'TrackDataFromMSR',
+                        'IndustryType' =>'Retail',
+                        'Reference' => 'xyz',
+                        'EmployeeId' => '11'
 		));
 		
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
@@ -356,7 +388,11 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
                             'SecurePaymentAccountData' => '576F2E197D5804F2B6201FB2578DCD1DDDC7BAE692FE48E9C368E678914233561FB953DF47E29F88',
                             'EncryptionKeyId' => '9010010B257DC7000084'
                         ),
-			'order_id' => '629203'
+			'order_id' => '629203',
+                        'entry_mode' => 'TrackDataFromMSR',
+                        'IndustryType' =>'Retail',
+                        'Reference' => 'xyz',
+                        'EmployeeId' => '11'
 		));
 		
 		 
