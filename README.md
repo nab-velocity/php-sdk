@@ -24,9 +24,7 @@ $identitytoken = "PHNhbWw6QXNzZXJ0aW9uIE1ham9yVmVyc2lvbj0iMSIgTWlub3JWZXJzaW9uPS
 $applicationprofileid = 14644;  
 $merchantprofileid = "PrestaShop Global HC"; 
 $workflowid = 2317000001;
-$isTestAccount = true;
-
-Note: track1data and track2data optional.
+$isTestAccount = true; 
 
 try {
 	$velocityProcessor = new Velocity_Processor($applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken);
@@ -128,43 +126,54 @@ Below is an example of an authorize and capture with each of the different types
 ####	Authorize and capture with token Method:                   
 
     try {	
+
 	       $response = $velocityProcessor->authorizeAndCapture( array(
-					                    'amount' => 10.03, 
-						                'avsdata' => array(   'Street' => 'xyz', 
-                                                'City' => 'cityname', 
-                                                'StateProvince' => 'statecode', 
-                                                'PostalCode' => 'postcode', 
-                                                'Country' => 'countrycode three letter'
+			                    'amount' => 10.03, 
+				                'avsdata' => array(   'Street' => 'xyz', 
+                                        'City' => 'cityname', 
+                                        'StateProvince' => 'statecode', 
+                                        'PostalCode' => 'postcode', 
+                                        'Country' => 'countrycode three letter'
                                   ),
 							      'token' => $paymentAccountDataToken, 	
 							      'order_id' => '629203',
-							      'entry_mode' => '˜Keyed',
+							      'entry_mode' => 'Keyed',
                             	  'IndustryType' =>'Ecommerce',
-                          		'Reference' => '˜xyz',
-                        		  'EmployeeId' => '˜11'
+                          		'Reference' => 'xyz',
+                        		  'EmployeeId' => '11'
 							)
 						);
 				
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
+		echo 'AuthorizeAndCapture Successful!</br>';
+		echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
+		echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
+		echo 'Amount: ' . $response['Amount'] . '</br>'; 
+		echo 'TransactionId: ' . $response['TransactionId']; 
+		} else {
+			// some error
+			print_r($response);
+		}
+		
 		$authCapTransactionid = $response['TransactionId'];
 		
     } catch(Exception $e) {
 		echo $e->getMessage(); 
     } 
+```
 
-Note: $paymentAccountDataToken is get from verify response.
+#### Authorize and capture with keyed data
 
-
-#### Authorize and capture without token Method:   
-           
-    try {	
+```          
+try {	
 	       $response = $velocityProcessor->authorizeAndCapture( array(
-							        'amount' => 10.03, 
-						            'avsdata' => array(   'Street' => 'xyz', 
+    					        'amount' => 10.03, 
+    				            'avsdata' => array(   'Street' => 'xyz', 
                                     'City' => 'cityname', 
                                     'StateProvince' => 'statecode', 
                                     'PostalCode' => 'postcode', 
-                                     'Country' => 'countrycode three letter'
-                                ),
+                                     'Country' => 'countrycode three letter' 
+                                     ),
  					            'carddata' => array(    
                                     'cardowner' => 'Jane Doe', 
                                     'cardtype' => 'Visa', 
@@ -174,46 +183,72 @@ Note: $paymentAccountDataToken is get from verify response.
 							        'track1data' => '', 
                         			'track2data' => ''                                                                    ),
 							     'order_id' => '629203',
-							     'entry_mode' => '˜Keyed',
+							     'entry_mode' => 'Keyed',
                             	 'IndustryType' =>'Ecommerce',
-                          	   'Reference' => '˜xyz',
-                        		 'EmployeeId' => '˜11'
+                          	   'Reference' => 'xyz',
+                        		 'EmployeeId' => '11'
 							)
 						 );
 		
-		$authCapTransactionid = $response['TransactionId'];
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
+		echo 'AuthorizeAndCapture Successful!</br>';
+		echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
+		echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
+		echo 'Amount: ' . $response['Amount'] . '</br>'; 
+		echo 'TransactionId: ' . $response['TransactionId']; 
+		} else {
+			// some error
+			print_r($response);
+		}
+	
+	$authCapTransactionid = $response['TransactionId'];
 		
     } catch(Exception $e) {
 		echo $e->getMessage(); 
     }
+```
 
-    OR
+### Authorize and capture with swiped data
 
-    try {	
+``` 
+	
+	try {	
 	       $response = $velocityProcessor->authorizeAndCapture( array(
-							      'amount' => 10.03, 
-						          'avsdata' => array(   'Street' => 'xyz', 
-                                              'City' => 'cityname', 
-                                               'StateProvince' => 'statecode', 
-                                               'PostalCode' => 'postcode', 
-                                               'Country' => 'countrycode three letter'
-                                            ),
- 					             'carddata' => array(    'cardowner' => 'Jane Doe', 
-                                            'cardtype' => 'Visa', 
-                                            'pan' => '', 
-                                            'expire' => '', 
-                                             'cvv' => ''
-							     'track1data' => track1data, 
-                        		 'track2data' => '˜'                                                                    ),
-							     'order_id' => '629203',
-							     'entry_mode' => '˜TrackDataFromMSR',
-                            	 'IndustryType' =>'Retail',
-                          	   'Reference' => '˜xyz',
-                        		 'EmployeeId' => '˜11'
-							)
-						 );
+	      'amount' => 10.03, 
+          'avsdata' => array(   'Street' => 'xyz', 
+                      'City' => 'cityname', 
+                       'StateProvince' => 'statecode', 
+                       'PostalCode' => 'postcode', 
+                       'Country' => 'countrycode three letter'
+                    ),
+          'carddata' => array(    'cardowner' => 'Jane Doe', 
+                    'cardtype' => 'Visa', 
+                    'pan' => '', 
+                    'expire' => '', 
+                     'cvv' => ''
+	                 'track1data' => '%B4012000033330026^NAJEER/SHAIK ^0904101100001100000000123456780?', 
+		             'track2data' => '' 
+		             ),
+                 'order_id' => '629203',
+                 'entry_mode' => 'TrackDataFromMSR',
+            	 'IndustryType' =>'Retail',
+                 'Reference' => 'xyz',
+            	 'EmployeeId' => '11'
+            )
+            );
 		
-		$authCapTransactionid = $response['TransactionId'];
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
+		echo 'AuthorizeAndCapture Successful!</br>';
+		echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
+		echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
+		echo 'Amount: ' . $response['Amount'] . '</br>'; 
+		echo 'TransactionId: ' . $response['TransactionId']; 
+		} else {
+			// some error
+			print_r($response);
+		}
+	
+	$authCapTransactionid = $response['TransactionId'];
 		
     } catch(Exception $e) {
 		echo $e->getMessage(); 
@@ -235,26 +270,88 @@ Note: $paymentAccountDataToken is get from verify response.
                                 'pan' => '', 
                                 'expire' => '', 
                                 'cvv' => ''
-							    'track1data' => '˜', 
-                        		'track2data' => track2data,
+							    'track1data' => '', 
+                        		'track2data' => '4012000033330026=09041011000012345678',
                         		),
 							 'order_id' => '629203',
-							 'entry_mode' => '˜TrackDataFromMSR',
+							 'entry_mode' => 'TrackDataFromMSR',
                              'IndustryType' =>'Retail',
-                          	 'Reference' => '˜xyz',
-                        	  'EmployeeId' => '˜11'
+                          	 'Reference' => 'xyz',
+                        	  'EmployeeId' => '11'
 							)
 						 );
 
-		$authCapTransactionid = $response['TransactionId'];
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
+			echo 'AuthorizeAndCapture Successful!</br>';
+			echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
+			echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
+			echo 'Amount: ' . $response['Amount'] . '</br>'; 
+			echo 'TransactionId: ' . $response['TransactionId']; 
+		} else {
+			// some error
+			print_r($response);
+		}
+	
+	$authCapTransactionid = $response['TransactionId'];
 		
     } catch(Exception $e) {
 		echo $e->getMessage(); 
     }
+```
 
-#####	Authorize method with Token:    
-               
-          try {
+### Authorize and capture with encrypted data
+
+Before doing the actualy transaction, you must re-instantiate your processor with the proper workflow id (provided by your velocity representative):
+
+```
+	$workflowid = 'BBBAAA0001';
+	try {
+		$velocityProcessor = new VelocityProcessor( $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken );
+	} catch (Exception $e) {
+	    echo $e->getMessage();
+	}
+```
+
+Then you can perform the transaction:
+
+```          
+	try{
+                $response = $velocityProcessor->authorizeAndCapture( array( 
+                        'amount' => $cash, 
+                        'p2pedata' => array(
+                         'SecurePaymentAccountData' => $SecurePaymentAccountData,
+                         'EncryptionKeyId' => $EncryptionKeyId
+                        ),
+                        'order_id' => '629203'
+				        'entry_mode' => 'Keyed',
+                        'IndustryType' =>'Ecommerce',
+                        'Reference' => 'xyz',
+                    	'EmployeeId' => '11'
+                    ));
+                        
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
+			echo 'AuthorizeAndCapture Successful!</br>';
+			echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
+			echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
+			echo 'Amount: ' . $response['Amount'] . '</br>'; 
+			echo 'TransactionId: ' . $response['TransactionId']; 
+		} else {
+			// some error
+			print_r($response);
+		}
+	
+	$authCapTransactionid = $response['TransactionId'];		
+        } catch (Exception $ex) {
+		    echo $e->getMessage();
+        }
+```
+
+The rest of the payment methods can be found below:
+
+#### Authorize method with Token
+
+```     
+try {
 	
 		$response = $velocityProcessor->authorize( array(
 								'amount' => 10,  
@@ -266,111 +363,102 @@ Note: $paymentAccountDataToken is get from verify response.
                                     ),
 								'token' => $paymentAccountDataToken,
 								'order_id' => '629203'
-								'entry_mode' => '˜Keyed',
+								'entry_mode' => 'Keyed',
                             	'IndustryType' =>'Ecommerce',
-                          	  'Reference' => '˜xyz',
-                        	    'EmployeeId' => '˜11'
+                          	  'Reference' => 'xyz',
+                        	    'EmployeeId' => '11'
                         	)); 
  		
-		$authTransactionid = $response['TransactionId'];
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
+			echo 'Authorize Successful!</br>';
+			echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
+			echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
+			echo 'Amount: ' . $response['Amount'] . '</br>'; 
+			echo 'TransactionId: ' . $response['TransactionId']; 
+		} else {
+			// some error
+			print_r($response);
+		}
 		
 	} catch (Exception $e) {
 		echo $e->getMessage(); die;	
-	}        
+	}              
+       
+```
+#### Authorize with keyed data
 
-#####	Authorize method without Token:    
-               
-          try {
-	
-	            $response = $velocityProcessor->authorize( array(
-							  'amount' => 10,  
-						      'avsdata' => array(   'Street' => 'xyz', 
-                              'City' => 'cityname', 
-                              'StateProvince' => 'statecode', 
-                              'PostalCode' => 'postcode', 
-                              'Country' => 'countrycode three letter'
-                            ),
- 					       'carddata' => array(    'cardowner' => 'Jane Doe', 
-                            'cardtype' => 'Visa', 
-                            'pan' => '4012888812348882', 
-                            'expire' => '1215', 
-                            'cvv' => '123'
-							'track1data' => '', 
-                        	'track2data' => '˜'                                                                 ),
-						'order_id' => '629203'
-						'entry_mode' => '˜Keyed',
-                        'IndustryType' =>'Ecommerce',
-                        'Reference' => '˜xyz',
-                        'EmployeeId' => '˜11'
-					) ); 
- 
-		$authTransactionid = $response['TransactionId'];
-		
-	} catch (Exception $e) {
-		echo $e->getMessage(); die;
-	}      
-
-	OR
-
-	try {
-	
-		$response = $velocityProcessor->authorize( array(
-							      'amount' => 10,  
-						          'avsdata' => array(   'Street' => 'xyz', 
-                                  'City' => 'cityname', 
-                                  'StateProvince' => 'statecode', 
-                                  'PostalCode' => 'postcode', 
-                                  'Country' => 'countrycode three letter'
+```          
+try {	
+	       $response = $velocityProcessor->authorize( array(
+							        'amount' => 10.03, 
+						            'avsdata' => array(   'Street' => 'xyz', 
+                                    'City' => 'cityname', 
+                                    'StateProvince' => 'statecode', 
+                                    'PostalCode' => 'postcode', 
+                                     'Country' => 'countrycode three letter'
                                 ),
- 					           'carddata' => array(    'cardowner' => 'Jane Doe', 
-                                     'cardtype' => 'Visa', 
-                                     'pan' => '', 
-                                     'expire' => '', 
-                                     'cvv' => ''
-							         'track1data' => track1data, 
-                        			 'track2data' => '˜'
-                            ),
-						'order_id' => '629203'
-						'entry_mode' => '˜TrackDataFromMSR',
-                        'IndustryType' =>'Retail',
-                        'Reference' => '˜xyz',
-                        'EmployeeId' => '˜11'
-					)); 
- 
-		$authTransactionid = $response['TransactionId'];
+ 					            'carddata' => array(    
+                                    'cardowner' => 'Jane Doe', 
+                                    'cardtype' => 'Visa', 
+                                    'pan' => '4012888812348882', 
+                                    'expire' => '1215', 
+                                    'cvv' => '123'
+							        'track1data' => '', 
+                        			'track2data' => '' 
+                        			),
+							     'order_id' => '629203',
+							     'entry_mode' => 'Keyed',
+                            	 'IndustryType' =>'Ecommerce',
+                          	   'Reference' => 'xyz',
+                        		 'EmployeeId' => '11'
+							)
+						 );
 		
-	} catch (Exception $e) {
-		echo $e->getMessage(); die;
-	}      
-
-OR
-
-	try {
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
+		echo 'Authorize Successful!</br>';
+		echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
+		echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
+		echo 'Amount: ' . $response['Amount'] . '</br>'; 
+		echo 'TransactionId: ' . $response['TransactionId']; 
+		} else {
+			// some error
+			print_r($response);
+		}
 	
-		$response = $velocityProcessor->authorize( array(
-							  'amount' => 10,  
-						      'avsdata' => array(   'Street' => 'xyz', 
-                                        'City' => 'cityname', 
-                                        'StateProvince' => 'statecode', 
-                                        'PostalCode' => 'postcode', 
-                                        'Country' => 'countrycode three letter'
+	$authTransactionid = $response['TransactionId'];
+		
+    } catch(Exception $e) {
+		echo $e->getMessage(); 
+    }
+```
+
+### Authorize with swiped data
+
+``` 
+	
+	try {	
+	       $response = $velocityProcessor->authorize( array(
+						      'amount' => 10.03, 
+					          'avsdata' => array(   'Street' => 'xyz', 
+                                          'City' => 'cityname', 
+                                           'StateProvince' => 'statecode', 
+                                           'PostalCode' => 'postcode', 
+                                           'Country' => 'countrycode three letter'
                                         ),
- 					              'carddata' => array(    'cardowner' => 'Jane Doe', 
-                                          'cardtype' => 'Visa', 
-                                          'pan' => '', 
-                                          'expire' => '', 
-                                          'cvv' => ''
-							              'track1data' => '˜', 
-                        				  'track2data' => track2data
-                                ),
-							   'order_id' => '629203'
-							   'entry_mode' => '˜TrackDataFromMSR',
-                               'IndustryType' =>'Retail',
-                          	  'Reference' => '˜xyz',
-                        		'EmployeeId' => '˜11'
-							)); 
- 
-		$authTransactionid = $response['TransactionId'];
+ 				             'carddata' => array(    'cardowner' => 'Jane Doe', 
+                                        'cardtype' => 'Visa', 
+                                        'pan' => '', 
+                                        'expire' => '', 
+                                         'cvv' => ''
+						     'track1data' => '%B4012000033330026^NAJEER/SHAIK ^0904101100001100000000123456780?', 
+                    		 'track2data' => ''                                                                    ),
+							     'order_id' => '629203',
+							     'entry_mode' => 'TrackDataFromMSR',
+                            	 'IndustryType' =>'Retail',
+                          	   'Reference' => 'xyz',
+                        		 'EmployeeId' => '11'
+							)
+						 );
 		
 	} catch (Exception $e) {
 		echo $e->getMessage(); die;
@@ -439,6 +527,7 @@ OR
                         	  'EmployeeId' => '11'
 							)
 						 );
+
 
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'Authorize Successful!</br>';
@@ -583,24 +672,78 @@ try {
 	
 	$adjusttxnid = $response['TransactionId'];
 
+	$captxnid = $response['TransactionId'];
+		
+} catch(Exception $e) {
+	echo $e->getMessage();
+}
 
 
+#### Undo (Void/Reversal)                   
 
-
-#####	ReturnById method:             
-      
-          try {
-		$response = $velocityProcessor->returnById( array(
-								  'amount' => 5.03, 
-								  'TransactionId' => $authCapTransactionid
-								  ) 
-							  );
+try {
 	
-    } catch (Exception $e) {
-		echo $e->getMessage();
+	$response = $velocityProcessor->undo(array(
+		'TransactionId' => $adjusttxnid
+	));
+	
+	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+		echo 'Undo Successful!</br>';
+		echo 'TransactionId: ' . $response['TransactionId'] . '</br></br>'; 
+	} else {
+		// some error
+		print_r($response);
+	}
+							   		
+} catch (Exception $e) {
+	echo $e->getMessage();
+} 
+
+
+#### Adjust        
+  
+try {
+		
+	$response = $velocityProcessor->adjust(array(
+		'amount' => 3.01, 
+		'TransactionId' => $captxnid
+	));
+	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+		echo 'Adjust Successful!</br>';
+		echo 'Amount: ' . $response['Amount'] . '</br></br>'; 
+		$adjusttxnid = $response['TransactionId'];
+	} else {
+		// some error
+		print_r($response);
+	}
+		
+} catch (Exception $e) {
+	echo $e->getMessage();
+}
+
+
+#### ReturnById            
+
+try {
+	$response = $velocityProcessor->returnById(array(
+		'amount' => 5.03, 
+		'TransactionId' => $authCapTransactionid
+	));
+	
+	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+		echo 'ReturnById Successful!</br>';
+		echo 'ApprovalCode: ' . $response['ApprovalCode'] . '</br></br>'; 
+	} else {
+		// some error
+		print_r($response);
 	}
 
-  
+} catch (Exception $e) {
+	echo $e->getMessage();
+}
+
+#### ReturnUnlinked with token: 
+
 try {
 				
 	$response = $velocityProcessor->returnUnlinked(array( 
@@ -624,10 +767,10 @@ try {
 } catch (Exception $e) {
 	echo $e->getMessage();
 }
-```
+
 #### ReturnUnlinked with keyed data
 
-```          
+        
 try {	
 	    $response = $velocityProcessor->returnUnlinked( array( 
 							  'amount' => 1.03, 
@@ -657,12 +800,10 @@ try {
     } catch(Exception $e) {
 		echo $e->getMessage(); 
     }
-```
+
 
 ### ReturnUnlinked with swiped data
 
-``` 
-	
 	try {	
 	       $response = $velocityProcessor->returnUnlinked( array( 
 						  'amount' => 1.03, 
@@ -696,9 +837,9 @@ try {
 
           OR
 
+
 	try {	
 	       $response = $velocityProcessor->returnUnlinked( array( 
-
 							  'amount' => 1.03, 
 						      'carddata' => array(    'cardowner' => 'Jane Doe', 
                                       'cardtype' => 'Visa', 
@@ -714,7 +855,6 @@ try {
                           	 'Reference' => 'xyz',
                         	   'EmployeeId' => '11'
 						));
-	
 
 	$response = $velocityProcessor->verify(array(  									
 		'avsdata' => array(   
@@ -743,71 +883,6 @@ try {
 	}
 
 
-For below all credential provided by velocity gateway. 
-$SecurePaymentAccountData
-$EncryptionKeyId
-
-#####	    P2PE for Authorize:
-
-        try{
-            $response = $velocityProcessor->authorize(
-		                    array( 
-                            'amount' => $cash, 
-                            'p2pedata' => array(
-                            'SecurePaymentAccountData' => $SecurePaymentAccountData,
-                            'EncryptionKeyId' => $EncryptionKeyId
-                            ),
-                            'order_id' => '629203'
-			   		     'entry_mode' => '˜Keyed',
-                            'IndustryType' =>'Ecommerce',
-                            'Reference' => '˜xyz',
-                            'EmployeeId' => '˜11'
-                        )
-);
-             } catch (Exception $ex) {
-		echo $e->getMessage();
-}
-
-####	    P2PE for AuthorizeandCapture:
-
-        try{
-                $response = $velocityProcessor->authorizeAndCapture(
-		                    array( 
-                            'amount' => $cash, 
-                            'p2pedata' => array(
-                            'SecurePaymentAccountData' => $SecurePaymentAccountData,
-                                'EncryptionKeyId' => $EncryptionKeyId
-                            ),
-                            'order_id' => '629203'
-					        'entry_mode' => '˜Keyed',
-                            'IndustryType' =>'Ecommerce',
-                            'Reference' => '˜xyz',
-                        	'EmployeeId' => '˜11'
-                        ));
-                        
-        } catch (Exception $ex) {
-		    echo $e->getMessage();
-        }
-
-
-#####	    P2PE for ReturnUnlinked:
-
-        try{
-            $response = $velocityProcessor->returnUnlinked ( array( 
-                             'amount' => $cash, 
-                             'p2pedata' => array(
-                            'SecurePaymentAccountData' => $SecurePaymentAccountData,
-                                'EncryptionKeyId' => $EncryptionKeyId
-                            ),
-                            'order_id' => '629203'
-					        'entry_mode' => '˜Keyed',
-                            'IndustryType' =>'Ecommerce',
-                            'Reference' => '˜xyz',
-                            'EmployeeId' => '˜11'
-                        ));
-    } catch (Exception $ex) {
-		echo $e->getMessage();
-
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'ReturnUnlinked Successful!</br>';
 			echo 'ApprovalCode: ' . $response['ApprovalCode'] . '</br></br>'; 
@@ -819,24 +894,21 @@ $EncryptionKeyId
     } catch(Exception $e) {
 		echo $e->getMessage(); 
     }
-```
 
 ### ReturnUnlinked with encrypted data
 
 Before doing the actualy transaction, you must re-instantiate your processor with the proper workflow id (provided by your velocity representative):
 
-```
 	$workflowid = 'BBBAAA0001';
 	try {
 		$velocityProcessor = new VelocityProcessor( $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken );
 	} catch (Exception $e) {
 	    echo $e->getMessage();
 	}
-```
+
 
 Then you can perform the transaction:
-
-```          
+      
 	try{
                 $response = $velocityProcessor->returnUnlinked ( array( 
                              'amount' => $cash, 
@@ -863,7 +935,7 @@ Then you can perform the transaction:
         }
      
 #### Verify with keyed data  
-```   
+
     try {
             	$response = $velocityProcessor->verify(array(  									
                 		'avsdata' => array(   
@@ -901,11 +973,123 @@ Then you can perform the transaction:
     } catch(Exception $e) {
     	echo $e->getMessage();
     }
-``` 
+
+
+### Verify with swiped data
+
+	try {	
+	       $response = $velocityProcessor->verify( array(  	
+		                    'avsdata' => array(   'Street' => 'xyz', 
+                            'City' => 'cityname', 
+                            'StateProvince' => 'statecode', 
+                            'PostalCode' => 'postcode', 
+                            'Country' => 'countrycode three letter'
+                            ),
+                            'order_id' => '629203'
+					        'entry_mode' => '˜Keyed',
+                            'IndustryType' =>'Ecommerce',
+                            'Reference' => '˜xyz',
+                            'EmployeeId' => '˜11'
+                        ));
+    } catch (Exception $ex) {
+		echo $e->getMessage();
+
+		if (isset($response['Status']) && $response['Status'] == 'Successful') {
+			echo 'ReturnUnlinked Successful!</br>';
+			echo 'ApprovalCode: ' . $response['ApprovalCode'] . '</br></br>'; 
+		} else {
+			// some error
+			print_r($response);
+		}
+		
+    } catch(Exception $e) {
+		echo $e->getMessage(); 
+    }
+
+### ReturnUnlinked with encrypted data
+
+Before doing the actualy transaction, you must re-instantiate your processor with the proper workflow id (provided by your velocity representative):
+
+
+	$workflowid = 'BBBAAA0001';
+	try {
+		$velocityProcessor = new VelocityProcessor( $applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken );
+	} catch (Exception $e) {
+	    echo $e->getMessage();
+	}
+
+
+Then you can perform the transaction:
+    
+	try{
+                $response = $velocityProcessor->returnUnlinked ( array( 
+                             'amount' => $cash, 
+                             'p2pedata' => array(
+                            'SecurePaymentAccountData' => $SecurePaymentAccountData,
+                                'EncryptionKeyId' => $EncryptionKeyId
+                            ),
+                            'order_id' => '629203'
+					        'entry_mode' => 'Keyed',
+                            'IndustryType' =>'Ecommerce',
+                            'Reference' => 'xyz',
+                            'EmployeeId' => '11'
+                        ));
+                        
+				if (isset($response['Status']) && $response['Status'] == 'Successful') {
+					echo 'ReturnUnlinked Successful!</br>';
+					echo 'ApprovalCode: ' . $response['ApprovalCode'] . '</br></br>'; 
+				} else {
+					// some error
+					print_r($response);
+				}	
+        } catch (Exception $ex) {
+		    echo $e->getMessage();
+        }
+     
+#### Verify with keyed data  
+
+    try {
+            	$response = $velocityProcessor->verify(array(  									
+                		'avsdata' => array(   
+                			'Street' => 'xyz', 
+                			'City' => 'cityname', 
+                			'StateProvince' => 'statecode', 
+                			'PostalCode' => 'postcode', 
+                			'Country' => 'countrycode three letter'
+                		),
+                		'carddata' => array(    
+                				'cardowner' => 'Jane Doe', 
+                				'cardtype' => 'Visa', 
+                				'pan' => '4012888812348882', 
+                				'expire' => '1215', 
+                				'cvv' => '123'
+                				'track1data' => '', 
+                				'track2data' => ''
+                            ),
+                		'order_id' => '629203'
+                		'entry_mode' => 'Keyed',
+                		'IndustryType' =>'Ecommerce',
+                		'Reference' => 'xyz',
+                		'EmployeeId' => '11'										
+                	)); 
+
+	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+		echo 'Verify Successful!</br>';
+		echo 'PostalCodeResult: ' . $response['AVSResult']['PostalCodeResult'] . '</br>'; 
+		echo 'CVResult: ' . $response['CVResult']; 
+	} else {
+		// some error
+		print_r($response);
+	}
+
+    } catch(Exception $e) {
+    	echo $e->getMessage();
+    }
+
 
 
 #### Verify with swiped data
-``` 
+
 	
 	try {	
 	       $response = $velocityProcessor->verify( array(  	
@@ -970,6 +1154,7 @@ Then you can perform the transaction:
                         				'EmployeeId' => '11'
 						)); 
 
+
 		if (isset($response['Status']) && $response['Status'] == 'Successful') {
 			echo 'Verify Successful!</br>';
 			echo 'PostalCodeResult: ' . $response['AVSResult']['PostalCodeResult'] . '</br>'; 
@@ -982,19 +1167,21 @@ Then you can perform the transaction:
     } catch(Exception $e) {
 		echo $e->getMessage(); 
     }
-```
-		
+
+	
 #### CaptureAll Method:
 
-```
+
     try{
 		$velocityProcessor->captureAll();
     } catch (Exception $ex) {
 		echo $e->getMessage();
     }
-```
+
+
 
 #### QueryTransactionDetail Method:
+
 
 ```
     try {
@@ -1033,4 +1220,3 @@ Then you can perform the transaction:
     } catch(Exception $e) {
 	    echo $e->getMessage();
     }
-
