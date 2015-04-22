@@ -790,7 +790,7 @@ Then you can perform the transaction:
 ``` 
 
 
-### Verify with swiped data
+#### Verify with swiped data
 ``` 
 	
 	try {	
@@ -866,7 +866,7 @@ Then you can perform the transaction:
     }
 ```
 		
-####CaptureAll Method:
+#### CaptureAll Method:
 
 ```
     try{
@@ -876,7 +876,7 @@ Then you can perform the transaction:
     }
 ```
 
-####QueryTransactionDetail Method:
+#### QueryTransactionDetail Method:
 
 ```
     try {
