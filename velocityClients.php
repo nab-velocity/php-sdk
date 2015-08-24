@@ -118,7 +118,7 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 		$response = $velocityProcessor->authorizeAndCapture(array(
 			'amount' => 10.03, 
 			'avsdata' => $avsData,
-			'carddata' => $cardDataKeyed,
+			'carddata' => $cardData,
 			'order_id' => '629203',
 		));
 		
@@ -144,7 +144,7 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 		$response = $velocityProcessor->authorizeAndCapture(array(
 			'amount' => 10.03, 
 			'avsdata' => $avsData,
-			'carddata' => $cardDataSwiped,
+			'carddata' => $cardData,
 			'order_id' => '629203',
 		));
 		
@@ -289,13 +289,14 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	try {
 				
 		$response = $velocityProcessor->returnUnlinked(array( 
-			'amount' => 1.03, 
-			'token' => $paymentAccountDataToken, 
-			'order_id' => '629203',
-                        'entry_mode' => 'Keyed',
-                        'IndustryType' =>'Ecommerce',
-                        'Reference' => 'xyz',
-                        'EmployeeId' => '11'
+			'amount'       => 1.03, 
+			'avsdata'      => $avsData,
+			'carddata'     => $cardData, 
+			'order_id'     => '629203',
+                        'entry_mode'   => 'Keyed',
+                        'IndustryType' => 'Ecommerce',
+                        'Reference'    => 'xyz',
+                        'EmployeeId'   => '11'
 		));
 		
 		 
@@ -325,8 +326,8 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
                                     'ApprovalCodes' => array('VI0000'),
                                     'BatchIds' => array('0539'),
                                     'CaptureDateRange' => array(
-                                        'EndDateTime' => '2015-03-17 02:03:40',
-                                        'StartDateTime' => '2015-03-13 02:03:40'
+                                        'EndDateTime' => '2015-07-17 02:03:40',
+                                        'StartDateTime' => '2015-07-13 02:03:40'
                                     ),
                                     'CaptureStates' => array('ReadyForCapture'),
                                     'CardTypes' => array('Visa'),
@@ -340,8 +341,8 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
                                         )
                                     ),
                                     'TransactionDateRange' => array(
-                                        'EndDateTime' => '2015-03-17 02:03:40',
-                                        'StartDateTime' => '2015-03-13 02:03:40'
+                                        'EndDateTime' => '2015-07-17 02:03:40',
+                                        'StartDateTime' => '2015-07-13 02:03:40'
                                     ),
                                     'TransactionIds' => array('9B935E96763F43C3866F603319BE7B52'),
                                     'TransactionStates' => array('Authorized')                        
@@ -404,7 +405,7 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	
 	try {
 			
-		$response = $VelocityProcessor->authorizeAndCapture(array(
+		$response = $velocityProcessor->authorizeAndCapture(array(
 			'amount' => 10.03, 
 			'avsdata' => $avsData,
                         'p2pedata' => array(
@@ -438,7 +439,7 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	
 	try {
 				
-		$response = $VelocityProcessor->returnUnlinked(array( 
+		$response = $velocityProcessor->returnUnlinked(array( 
 			'amount' => 1.03, 
                         'p2pedata' => array(
                             'SecurePaymentAccountData' => '576F2E197D5804F2B6201FB2578DCD1DDDC7BAE692FE48E9C368E678914233561FB953DF47E29F88',
