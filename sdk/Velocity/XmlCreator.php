@@ -82,7 +82,6 @@ class VelocityXmlCreator {
 			if(isset($data['billingdata']['address'])) { 
 				$n3 = $xml->createElement("ns2:Address");
 				$n2->appendChild($n3);
-		
 				VelocityXmlCreator::populate_XML_element_if_array_value_isset('street', "ns2:Street1", $xml, $n3, $data['billingdata']['address']);
 				VelocityXmlCreator::populate_XML_element_if_array_value_isset('Street2', "ns2:Street2", $xml, $n3, $data['billingdata']['address']);
 				VelocityXmlCreator::populate_XML_element_if_array_value_isset('City', "ns2:City", $xml, $n3, $data['billingdata']['address']);
@@ -94,7 +93,6 @@ class VelocityXmlCreator {
 			VelocityXmlCreator::populate_XML_element_if_array_value_isset('phone', "ns2:Phone", $xml, $n1, $data['billingdata']);
 			VelocityXmlCreator::populate_XML_element_if_array_value_isset('fax', "ns2:Fax", $xml, $n1, $data['billingdata']);
 			VelocityXmlCreator::populate_XML_element_if_array_value_isset('email', "ns2:Email", $xml, $n1, $data['billingdata']);
-
 			VelocityXmlCreator::populate_XML_element_if_array_value_isset('customer_id', "ns2:CustomerId", $xml, $n1, $data);
 			VelocityXmlCreator::populate_XML_element_if_array_value_isset('customer_tax_id', "ns2:CustomerTaxId", $xml, $n1, $data);
 		}
