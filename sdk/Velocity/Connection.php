@@ -212,11 +212,13 @@ class VelocityConnection
             if (preg_match('/json/', $contentType)) {
                     $response = json_decode($body, true); 
             } elseif (preg_match('/xml/', $contentType)) {
-                $arr = explode('Path=/', $body);
-                    if(isset($arr[1]))
-                       $response = VelocityXmlParser::parse($arr[1]);
-                    else
-                       $response = VelocityXmlParser::parse($body);
+                // $arr = explode('Path=/', $body);
+                    // if(isset($arr[1]))
+                       // $response = VelocityXmlParser::parse($arr[1]);
+                    // else
+                       // $response = VelocityXmlParser::parse($body);
+				preg_match('/<.*/', $body, $matches, PREG_OFFSET_CAPTURE);
+				$response = Velocity_XmlParser::parse($matches[0][0]);
             }
 
             return array($error, $response);
