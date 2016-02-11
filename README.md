@@ -45,50 +45,50 @@ Below is an example of an authorize and capture with each of the different types
 
    
      try {
-	$response = $velocityProcessor->authorizeAndCapture(array(
-		'amount' => 10.03, 
-		'avsdata' => array(   
-			'Street' => 'xyz', 
-			'City' => 'cityname', 
-			'StateProvince' => 'statecode', 
-			'PostalCode' => 'postcode', 
-			'Country' => 'countrycode three letter'
-		),
-		'token' => $paymentAccountDataToken, 								      
-		'order_id' => '629203',
-	));
+        	$response = $velocityProcessor->authorizeAndCapture(array(
+        		'amount' => 10.03, 
+        		'avsdata' => array(   
+        			'Street' => 'xyz', 
+        			'City' => 'cityname', 
+        			'StateProvince' => 'statecode', 
+        			'PostalCode' => 'postcode', 
+        			'Country' => 'countrycode three letter'
+        		),
+        		'token' => $paymentAccountDataToken, 								      
+        		'order_id' => '629203',
+        	));
 	
-	if (isset($response['Status']) && $response['Status'] == 'Successful') {
-		echo 'AuthorizeAndCapture Successful!</br>';
-		echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
-		echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
-		echo 'Amount: ' . $response['Amount'] . '</br>'; 
-		echo 'TransactionId: ' . $response['TransactionId']; 
-	} else {
-		// some error
-		print_r($response);
-	}
+        	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+        		echo 'AuthorizeAndCapture Successful!</br>';
+        		echo 'Masked PAN: ' . $response['MaskedPAN'] . '</br>';
+        		echo 'Approval Code: ' . $response['ApprovalCode'] . '</br>';
+        		echo 'Amount: ' . $response['Amount'] . '</br>'; 
+        		echo 'TransactionId: ' . $response['TransactionId']; 
+        	} else {
+        		// some error
+        		print_r($response);
+        	}
 	
-		$response = $velocityProcessor->verify( array(  	
-		                    'avsdata' => array(   'Street' => 'xyz', 
-                            'City' => 'cityname', 
-                            'StateProvince' => 'statecode', 
-                            'PostalCode' => 'postcode', 
-                            'Country' => 'countrycode three letter'
-                            ),
-					        'carddata' => array(    'cardowner' => 'Jane Doe', 
-                            'cardtype' => 'Visa', 
-                            'pan' => '', 
-                            'expire' => '', 
-                            'cvv' => '' 
-						    'track1data' => $track1data, 
-                            'track2data' => '˜'
-                         )
-						'entry_mode' => '˜TrackDataFromMSR',
-                            			'IndustryType' =>'Retail',
-                          			  'Reference' => '˜xyz',
-                        				'EmployeeId' => '˜11'
-						)); 
+		    $response = $velocityProcessor->verify( array(  	
+                'avsdata' => array(   'Street' => 'xyz', 
+                'City' => 'cityname', 
+                'StateProvince' => 'statecode', 
+                'PostalCode' => 'postcode', 
+                'Country' => 'countrycode three letter'
+                ),
+		        'carddata' => array(    'cardowner' => 'Jane Doe', 
+                'cardtype' => 'Visa', 
+                'pan' => '', 
+                'expire' => '', 
+                'cvv' => '' 
+			    'track1data' => $track1data, 
+                'track2data' => '˜'
+             )
+			'entry_mode' => '˜TrackDataFromMSR',
+                			'IndustryType' =>'Retail',
+              			  'Reference' => '˜xyz',
+            				'EmployeeId' => '˜11'
+			)); 
 	 	
     } catch(Exception $e) {
 		echo $e->getMessage();
@@ -160,12 +160,9 @@ Below is an example of an authorize and capture with each of the different types
     } catch(Exception $e) {
 		echo $e->getMessage(); 
     } 
-```
 
 #### Authorize and capture with keyed data
-
-```          
-try {	
+    try {	
 	       $response = $velocityProcessor->authorizeAndCapture( array(
     					        'amount' => 10.03, 
     				            'avsdata' => array(   'Street' => 'xyz', 
@@ -383,12 +380,9 @@ try {
 	} catch (Exception $e) {
 		echo $e->getMessage(); die;	
 	}              
-       
-```
-#### Authorize with keyed data
 
-```          
-try {	
+#### Authorize with keyed data
+    try {	
 	       $response = $velocityProcessor->authorize( array(
 							        'amount' => 10.03, 
 						            'avsdata' => array(   'Street' => 'xyz', 
@@ -615,163 +609,160 @@ Then you can perform the transaction:
        
       try {
 		$response = $velocityProcessor->adjust(array(
-		'amount' => 3.01, 
-		'TransactionId' => $captxnid
-	));
-	if (isset($response['Status']) && $response['Status'] == 'Successful') {
-		echo 'Adjust Successful!</br>';
-		echo 'Amount: ' . $response['Amount'] . '</br></br>'; 
-		$adjusttxnid = $response['TransactionId'];
-	} else {
-		// some error
-		print_r($response);
-		 		
-	} catch (Exception $e) {
-		echo $e->getMessage();
-	}
-	
-	$adjusttxnid = $response['TransactionId'];
-
-	$captxnid = $response['TransactionId'];
+    		'amount' => 3.01, 
+    		'TransactionId' => $captxnid
+    	));
+    	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+    		echo 'Adjust Successful!</br>';
+    		echo 'Amount: ' . $response['Amount'] . '</br></br>'; 
+    		$adjusttxnid = $response['TransactionId'];
+    	} else {
+    		// some error
+    		print_r($response);
+    		 		
+    	} catch (Exception $e) {
+    		echo $e->getMessage();
+    	}
+	    $adjusttxnid = $response['TransactionId'];
+	    $captxnid = $response['TransactionId'];
 		
-} catch(Exception $e) {
-	echo $e->getMessage();
-}
+    } catch(Exception $e) {
+    	echo $e->getMessage();
+    }
 
-try {
-	$response = $velocityProcessor->undo(array(
-		'TransactionId' => $adjusttxnid
-	));
+    try {
+        	$response = $velocityProcessor->undo(array(
+        		'TransactionId' => $adjusttxnid
+        	));
 	
-	if (isset($response['Status']) && $response['Status'] == 'Successful') {
-		echo 'Undo Successful!</br>';
-		echo 'TransactionId: ' . $response['TransactionId'] . '</br></br>'; 
-	} else {
-		// some error
-		print_r($response);
-	}
+        	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+        		echo 'Undo Successful!</br>';
+        		echo 'TransactionId: ' . $response['TransactionId'] . '</br></br>'; 
+        	} else {
+        		// some error
+        		print_r($response);
+        	}
 							   		
-} catch (Exception $e) {
-	echo $e->getMessage();
-} 
+    } catch (Exception $e) {
+    	echo $e->getMessage();
+    } 
 
-try {		
-	$response = $velocityProcessor->adjust(array(
-		'amount' => 3.01, 
-		'TransactionId' => $captxnid
-	));
-	if (isset($response['Status']) && $response['Status'] == 'Successful') {
-		echo 'Adjust Successful!</br>';
-		echo 'Amount: ' . $response['Amount'] . '</br></br>'; 
-		$adjusttxnid = $response['TransactionId'];
-	} else {
-		// some error
-		print_r($response);
-
-	}
+    try {		
+    	$response = $velocityProcessor->adjust(array(
+    		'amount' => 3.01, 
+    		'TransactionId' => $captxnid
+    	));
+    	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+    		echo 'Adjust Successful!</br>';
+    		echo 'Amount: ' . $response['Amount'] . '</br></br>'; 
+    		$adjusttxnid = $response['TransactionId'];
+    	} else {
+    		// some error
+    		print_r($response);
+    
+    	}
 	
 	$adjusttxnid = $response['TransactionId'];
 
 	$captxnid = $response['TransactionId'];
 		
-} catch(Exception $e) {
-	echo $e->getMessage();
-}
+    } catch(Exception $e) {
+    	echo $e->getMessage();
+    }
 
 
 #### Undo (Void/Reversal)                   
 
-try {
+    try {
 	
-	$response = $velocityProcessor->undo(array(
-		'TransactionId' => $adjusttxnid
-	));
+    	$response = $velocityProcessor->undo(array(
+    		'TransactionId' => $adjusttxnid
+    	));
 	
-	if (isset($response['Status']) && $response['Status'] == 'Successful') {
-		echo 'Undo Successful!</br>';
-		echo 'TransactionId: ' . $response['TransactionId'] . '</br></br>'; 
-	} else {
-		// some error
-		print_r($response);
-	}
+    	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+    		echo 'Undo Successful!</br>';
+    		echo 'TransactionId: ' . $response['TransactionId'] . '</br></br>'; 
+    	} else {
+    		// some error
+    		print_r($response);
+    	}
 							   		
-} catch (Exception $e) {
-	echo $e->getMessage();
-} 
+    } catch (Exception $e) {
+    	echo $e->getMessage();
+    } 
 
 
 #### Adjust        
   
-try {
+    try {
 		
-	$response = $velocityProcessor->adjust(array(
-		'amount' => 3.01, 
-		'TransactionId' => $captxnid
-	));
-	if (isset($response['Status']) && $response['Status'] == 'Successful') {
-		echo 'Adjust Successful!</br>';
-		echo 'Amount: ' . $response['Amount'] . '</br></br>'; 
-		$adjusttxnid = $response['TransactionId'];
-	} else {
-		// some error
-		print_r($response);
-	}
+    	$response = $velocityProcessor->adjust(array(
+    		'amount' => 3.01, 
+    		'TransactionId' => $captxnid
+    	));
+    	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+    		echo 'Adjust Successful!</br>';
+    		echo 'Amount: ' . $response['Amount'] . '</br></br>'; 
+    		$adjusttxnid = $response['TransactionId'];
+    	} else {
+    		// some error
+    		print_r($response);
+    	}
 		
-} catch (Exception $e) {
-	echo $e->getMessage();
-}
+    } catch (Exception $e) {
+    	echo $e->getMessage();
+    }
 
 
 #### ReturnById            
 
-try {
-	$response = $velocityProcessor->returnById(array(
-		'amount' => 5.03, 
-		'TransactionId' => $authCapTransactionid
-	));
-	
-	if (isset($response['Status']) && $response['Status'] == 'Successful') {
-		echo 'ReturnById Successful!</br>';
-		echo 'ApprovalCode: ' . $response['ApprovalCode'] . '</br></br>'; 
-	} else {
-		// some error
-		print_r($response);
-	}
+    try {
+    	$response = $velocityProcessor->returnById(array(
+    		'amount' => 5.03, 
+    		'TransactionId' => $authCapTransactionid
+    	));
+    	
+    	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+    		echo 'ReturnById Successful!</br>';
+    		echo 'ApprovalCode: ' . $response['ApprovalCode'] . '</br></br>'; 
+    	} else {
+    		// some error
+    		print_r($response);
+    	}
 
-} catch (Exception $e) {
-	echo $e->getMessage();
-}
+    } catch (Exception $e) {
+    	echo $e->getMessage();
+    }
 
 #### ReturnUnlinked with token: 
 
-try {
+    try {
 				
-	$response = $velocityProcessor->returnUnlinked(array( 
-		'amount' => 1.03, 
-		'token' => $paymentAccountDataToken, 
-		'order_id' => '629203'
-		'entry_mode' => 'Keyed',
-        'IndustryType' =>'Ecommerce',
-        'Reference' => 'xyz',
-        'EmployeeId' => '11'
-	));
-		
-	if (isset($response['Status']) && $response['Status'] == 'Successful') {
-		echo 'ReturnUnlinked Successful!</br>';
-		echo 'ApprovalCode: ' . $response['ApprovalCode'] . '</br></br>'; 
-	} else {
-		// some error
-		print_r($response);
-	}
+    	$response = $velocityProcessor->returnUnlinked(array( 
+    		'amount' => 1.03, 
+    		'token' => $paymentAccountDataToken, 
+    		'order_id' => '629203'
+    		'entry_mode' => 'Keyed',
+            'IndustryType' =>'Ecommerce',
+            'Reference' => 'xyz',
+            'EmployeeId' => '11'
+    	));
+    		
+    	if (isset($response['Status']) && $response['Status'] == 'Successful') {
+    		echo 'ReturnUnlinked Successful!</br>';
+    		echo 'ApprovalCode: ' . $response['ApprovalCode'] . '</br></br>'; 
+    	} else {
+    		// some error
+    		print_r($response);
+    	}
 
-} catch (Exception $e) {
-	echo $e->getMessage();
-}
+    } catch (Exception $e) {
+    	echo $e->getMessage();
+    }
 
 #### ReturnUnlinked with keyed data
 
-        
-try {	
+    try {	
 	    $response = $velocityProcessor->returnUnlinked( array( 
 							  'amount' => 1.03, 
 						      'carddata' => array(    'cardowner' => 'Jane Doe', 
