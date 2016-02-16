@@ -81,32 +81,62 @@ class QueryTransactionsParameters {
                     }
                     
                     try { // set CaptureDateRange in object
-                        $CaptureDateRange = new DateRange($qtp['CaptureDateRange']);
+                        if (isset($qtp['CaptureDateRange'])){
+							$CaptureDateRange = new DateRange($qtp['CaptureDateRange']);
+						}
                     } catch (Exception $ex) {
                         throw new Exception($ex->getMessage());
                     }
                     
                     try { // set TransactionDateRange in object
-                        $TransactionDateRange = new DateRange($qtp['TransactionDateRange']);
+                        if (isset($qtp['TransactionDateRange'])){
+							$TransactionDateRange = new DateRange($qtp['TransactionDateRange']);
+						}
                     } catch (Exception $ex) {
                         throw new Exception($ex->getMessage());
                     }
                     
                     try {
-                        $this->Amounts = $qtp['Amounts']; // ArrayOfdecimal
-                        $this->ApprovalCodes = $qtp['ApprovalCodes']; // ArrayOfstring
-                        $this->BatchIds = $qtp['BatchIds']; // ArrayOfstring
-                        $this->CaptureDateRange = $qtp['CaptureDateRange']; // DateRange
-                        $this->CaptureStates = $qtp['CaptureStates'];
-                        $this->CardTypes = $qtp['CardTypes']; // ArrayOfTypeCardType
-                        $this->MerchantProfileIds = $qtp['MerchantProfileIds']; // ArrayOfstring
-                        $this->OrderNumbers = $qtp['OrderNumbers']; // ArrayOfstring
-                        $this->ServiceIds = $qtp['ServiceIds']; // ArrayOfstring
-                        $this->ServiceKeys = $qtp['ServiceKeys']; // ArrayOfstring
+                        if (isset($qtp['Amounts'])){
+							$this->Amounts = $qtp['Amounts']; // ArrayOfdecimal
+						}
+						if (isset($qtp['ApprovalCodes'])){
+							$this->ApprovalCodes = $qtp['ApprovalCodes']; // ArrayOfstring
+						}
+						if (isset($qtp['BatchIds'])){
+							$this->BatchIds = $qtp['BatchIds']; // ArrayOfstring
+						}
+						if (isset($qtp['CaptureDateRange'])){
+							$this->CaptureDateRange = $qtp['CaptureDateRange']; // DateRange
+						}
+						if (isset($qtp['CaptureStates'])){
+							$this->CaptureStates = $qtp['CaptureStates'];
+						}
+						if (isset($qtp['CardTypes'])){
+							$this->CardTypes = $qtp['CardTypes']; // ArrayOfTypeCardType
+						}
+						if (isset($qtp['MerchantProfileIds'])){
+							$this->MerchantProfileIds = $qtp['MerchantProfileIds']; // ArrayOfstring
+						}
+						if (isset($qtp['OrderNumbers'])){
+							$this->OrderNumbers = $qtp['OrderNumbers']; // ArrayOfstring
+						}
+						if (isset($qtp['ServiceIds'])){
+							$this->ServiceIds = $qtp['ServiceIds']; // ArrayOfstring
+						}
+						if (isset($qtp['ServiceKeys'])){
+							$this->ServiceKeys = $qtp['ServiceKeys']; // ArrayOfstring
+						}
                         $this->TransactionClassTypePairs = $tctp; // ArrayOfTransactionClassTypePair*/
-                        $this->TransactionDateRange = $qtp['TransactionDateRange'];//$txnDateRange; // DateRange
-                        $this->TransactionIds = $qtp['TransactionIds'];
-                        $this->TransactionStates = $qtp['TransactionStates']; // ArrayOfTransactionState
+                        if (isset($qtp['TransactionDateRange'])){
+							$this->TransactionDateRange = $qtp['TransactionDateRange'];//$txnDateRange; // DateRange
+						}
+						if (isset($qtp['TransactionIds'])){
+							$this->TransactionIds = $qtp['TransactionIds'];
+						}
+						if (isset($qtp['TransactionStates'])){
+							$this->TransactionStates = $qtp['TransactionStates']; // ArrayOfTransactionState
+						}
                     } catch (Exception $ex) {
                         throw new Exception(VelocityMessage::$descriptions['errqtp']);
                     }

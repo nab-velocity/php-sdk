@@ -18,7 +18,7 @@
             $(document).ready(function() {
             
                 $("#process-payment-btn").click(function(){
-					var applicationprofileid = 14644;
+		    var applicationprofileid = 14644;
                     var merchantprofileid = "PrestaShop Global HC";
 					var workflowid = 2317000001;
                     var sessionToken = '<?php echo $sessionToken; ?>';

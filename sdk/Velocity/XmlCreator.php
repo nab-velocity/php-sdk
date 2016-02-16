@@ -130,7 +130,7 @@ class VelocityXmlCreator {
 			
 			VelocityXmlCreator::populate_XML_element_if_array_value_isset('cardtype', "bcp:CardType", $xml, $n2, $data['carddata']);
 			
-			if( array_key_exists('track1data', $data['carddata']) || array_key_exists('track2data', $data['carddata'])) {
+			if( (array_key_exists('track1data', $data['carddata']) && $data['carddata']['track1data'] != '') || (array_key_exists('track2data', $data['carddata']) && $data['carddata']['track2data'] != '')) {
 				VelocityXmlCreator::populate_XML_element_if_array_value_isset('track1data', "bcp:Track1Data", $xml, $n2, $data['carddata']);
 				VelocityXmlCreator::populate_XML_element_if_array_value_isset('track2data', "bcp:Track2Data", $xml, $n2, $data['carddata']);
 			} else {
@@ -164,7 +164,7 @@ class VelocityXmlCreator {
 			} 
 			
 			if (isset($data['carddata']) && isset($data['carddata']['cvv'])) {
-                if( array_key_exists('track1data', $data['carddata']) || array_key_exists('track2data', $data['carddata'])) {
+				if ((!array_key_exists('track1data', $data['carddata']) || $data['carddata']['track1data'] == '') && (!array_key_exists('track2data', $data['carddata']) || $data['carddata']['track2data'] == '')) {
 					$n3 = $xml->createElement("bcp:CVDataProvided");
 					$idText = $xml->createTextNode('Provided');
 					$n3->appendChild($idText);
@@ -182,6 +182,7 @@ class VelocityXmlCreator {
 		VelocityXmlCreator::populate_XML_element_if_array_value_isset('currency_code', "txn:CurrencyCode", $xml, $n1, $data);
 		VelocityXmlCreator::populate_XML_element_if_array_value_isset('transaction_datetime', "txn:TransactionDateTime", $xml, $n1, $data);
 		VelocityXmlCreator::populate_XML_element_if_array_value_isset('campaign_id', "txn:CampaignId", $xml, $n1, $data);
+		VelocityXmlCreator::populate_XML_element_if_array_value_isset('Reference', "txn:Reference", $xml, $n1, $data);
 		VelocityXmlCreator::populate_XML_element_if_array_value_isset('IgnoreDuplicateCheck', "txn:IgnoreDuplicateCheck", $xml, $n1, $data);
 		VelocityXmlCreator::populate_XML_element_if_array_value_isset('AccountType', "txn:AccountType", $xml, $n1, $data);
 		

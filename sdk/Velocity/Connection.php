@@ -202,10 +202,12 @@ class VelocityConnection
             }
 
             if($data['method'] == 'querytransactionsdetail'){
-                $res = explode('Path=/', $body);              
+              $res = explode('Path=/', $body);              
+              if(isset($res[1]) && $res[1] != '')
                 $body = $res[1];
-                if($res[1] == '')
-                    $body = $res[0];
+              else{
+                $body = $res[0];
+              }
             } 
             // Parse response, depending on value of the Content-Type header.
             $response = null;
@@ -218,7 +220,7 @@ class VelocityConnection
                     // else
                        // $response = VelocityXmlParser::parse($body);
 				preg_match('/<.*/', $body, $matches, PREG_OFFSET_CAPTURE);
-				$response = Velocity_XmlParser::parse($matches[0][0]);
+                $response = VelocityXmlParser::parse($matches[0][0]);
             }
 
             return array($error, $response);
@@ -226,7 +228,7 @@ class VelocityConnection
 	}
 	
 	/*
-         * Returns an error object, corresponding to the HTTP status code returned by Velocity.
+	 * Returns an error object, corresponding to the HTTP status code returned by Velocity.
 	 * @param int $status error code.
 	 * @return object (null/Exception child class object) this is error detail of gateway response. 
 	 */
