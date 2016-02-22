@@ -491,7 +491,7 @@ if (isset($_POST['TransactionToken']) && $_POST['TransactionToken'] != '') {
 	} 
 
 } else {
-    echo Velocity_Message::$descriptions['errtransparentjs'];
+    echo VelocityMessage::$descriptions['errtransparentjs'];
 }
 
 ?>
