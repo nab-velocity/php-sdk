@@ -191,15 +191,15 @@ class VelocityConnection
                     $error = self::errorFromStatus($statusCode); // call exception classes according to error code.
             }
 
-            $match = null;
-            preg_match('/Content-Type: ([^;]*);/i', $body, $match);
-            $contentType;
-            if (isset($match[1])) {
-               $contentType = $match[1]; 
-            } else {
-               preg_match('/Content-Type: ([^;]*);/i', $header, $match);
-               $contentType = $match[1];
-            }
+            // $match = null;
+            // preg_match('/Content-Type: ([^;]*);/i', $body, $match);
+            // $contentType;
+            // if (isset($match[1])) {
+               // $contentType = $match[1]; 
+            // } else {
+               // preg_match('/Content-Type: ([^;]*);/i', $header, $match);
+               // $contentType = $match[1];
+            // }
 
             if($data['method'] == 'querytransactionsdetail'){
               $res = explode('Path=/', $body);              
@@ -211,9 +211,9 @@ class VelocityConnection
             } 
             // Parse response, depending on value of the Content-Type header.
             $response = null;
-            if (preg_match('/json/', $contentType)) {
-                    $response = json_decode($body, true); 
-            } elseif (preg_match('/xml/', $contentType)) {
+            // if (preg_match('/json/', $contentType)) {
+                    // $response = json_decode($body, true); 
+            // } elseif (preg_match('/xml/', $contentType)) {
                 // $arr = explode('Path=/', $body);
                     // if(isset($arr[1]))
                        // $response = VelocityXmlParser::parse($arr[1]);
@@ -221,7 +221,7 @@ class VelocityConnection
                        // $response = VelocityXmlParser::parse($body);
 				preg_match('/<.*/', $body, $matches, PREG_OFFSET_CAPTURE);
                 $response = VelocityXmlParser::parse($matches[0][0]);
-            }
+            //}
 
             return array($error, $response);
 	 
