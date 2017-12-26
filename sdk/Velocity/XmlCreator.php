@@ -95,7 +95,7 @@ class VelocityXmlCreator {
 			if(isset($data['billingdata']['address'])) { 
 				$n3 = $xml->createElement("txn:Address");
 				$n2->appendChild($n3);
-				VelocityXmlCreator::populate_XML_element_if_array_value_isset('street', "txn:Street1", $xml, $n3, $data['billingdata']['address']);
+				VelocityXmlCreator::populate_XML_element_if_array_value_isset('Street', "txn:Street1", $xml, $n3, $data['billingdata']['address']);
 				VelocityXmlCreator::populate_XML_element_if_array_value_isset('Street2', "txn:Street2", $xml, $n3, $data['billingdata']['address']);
 				VelocityXmlCreator::populate_XML_element_if_array_value_isset('City', "txn:City", $xml, $n3, $data['billingdata']['address']);
 				VelocityXmlCreator::populate_XML_element_if_array_value_isset('StateProvince', "txn:StateProvince", $xml, $n3, $data['billingdata']['address']);
