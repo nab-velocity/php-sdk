@@ -77,24 +77,28 @@ class VelocityXmlCreator {
 		$n->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:bcp', 'http://schemas.ipcommerce.com/CWS/v2.0/Transactions/Bankcard');
 		$n->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:txn', 'http://schemas.ipcommerce.com/CWS/v2.0/Transactions');
 		$n->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'i:type', 'bcp:BankcardTransaction');
-		
-		$n1 = $xml->createElement("temp");
+
+		if( isset($data['avsdata']) && !isset($data['billingdata']) ) {
+			$data['billingdata'] = array(
+				'address' => $data['avsdata'],
+			);
+		}
 
 		if( isset($data['billingdata'])	) {	
-			$n2 = $xml->createElement("txn:BillingData");
-			$n1->appendChild($n2);
+			$n1 = $xml->createElement("txn:BillingData");
+			$n->appendChild($n1);
 
 			VelocityXmlCreator::populate_XML_element_if_array_value_isset('name', "txn:Name", $xml, $n1, $data['billingdata']);
 			
 			if(isset($data['billingdata']['address'])) { 
-				$n3 = $xml->createElement("txn:Address");
-				$n2->appendChild($n3);
-				VelocityXmlCreator::populate_XML_element_if_array_value_isset('street', "txn:Street1", $xml, $n3, $data['billingdata']['address']);
-				VelocityXmlCreator::populate_XML_element_if_array_value_isset('Street2', "txn:Street2", $xml, $n3, $data['billingdata']['address']);
-				VelocityXmlCreator::populate_XML_element_if_array_value_isset('City', "txn:City", $xml, $n3, $data['billingdata']['address']);
-				VelocityXmlCreator::populate_XML_element_if_array_value_isset('StateProvince', "txn:StateProvince", $xml, $n3, $data['billingdata']['address']);
-				VelocityXmlCreator::populate_XML_element_if_array_value_isset('PostalCode', "txn:PostalCode", $xml, $n3, $data['billingdata']['address']);
-				VelocityXmlCreator::populate_XML_element_if_array_value_isset('Country', "txn:CountryCode", $xml, $n3, $data['billingdata']['address']);
+				$n2 = $xml->createElement("txn:Address");
+				$n1->appendChild($n2);
+				VelocityXmlCreator::populate_XML_element_if_array_value_isset('street', "txn:Street1", $xml, $n2, $data['billingdata']['address']);
+				VelocityXmlCreator::populate_XML_element_if_array_value_isset('Street2', "txn:Street2", $xml, $n2, $data['billingdata']['address']);
+				VelocityXmlCreator::populate_XML_element_if_array_value_isset('City', "txn:City", $xml, $n2, $data['billingdata']['address']);
+				VelocityXmlCreator::populate_XML_element_if_array_value_isset('StateProvince', "txn:StateProvince", $xml, $n2, $data['billingdata']['address']);
+				VelocityXmlCreator::populate_XML_element_if_array_value_isset('PostalCode', "txn:PostalCode", $xml, $n2, $data['billingdata']['address']);
+				VelocityXmlCreator::populate_XML_element_if_array_value_isset('Country', "txn:CountryCode", $xml, $n2, $data['billingdata']['address']);
 			}
 			
 			VelocityXmlCreator::populate_XML_element_if_array_value_isset('business_name', "txn:BusinessName", $xml, $n1, $data['billingdata']);
