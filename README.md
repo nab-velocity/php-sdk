@@ -27,7 +27,7 @@ $workflowid = 2317000001;
 $isTestAccount = true; 
 
 try {
-	$velocityProcessor = new Velocity_Processor($applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken);
+	$velocityProcessor = new VelocityProcessor($applicationprofileid, $merchantprofileid, $workflowid, $isTestAccount, $identitytoken);
 } catch (Exception $e) {
 	echo $e->getMessage();
 }
